@@ -1,0 +1,66 @@
+<div layout="column" class="content-card">
+  <admin-overlay visibility-level-id="$ctrl.content.visibilityLevel"></admin-overlay>
+  <div layout="row" layout-padding layout-align="space-between stretch">
+    <div class="left" layout="column" style="margin-right: 12.5px;">
+      <div class="md-media-sm card-media">
+        <a ng-href="{{$ctrl.url}}">
+          <img ng-if="!$ctrl.thumbnailUrl" src="https://placehold.it/160x95" alt="{{$ctrl.content.name}}"/>
+          <img ng-if="$ctrl.thumbnailUrl" ng-src="{{$ctrl.thumbnailUrl}}" alt="{{$ctrl.content.name}}"/>
+        </a>
+        <strong ng-if="$ctrl.thumbnailCaption" class="thumbnail-caption">{{$ctrl.thumbnailCaption}}</strong>
+      </div>
+    </div>
+    <div class="middle" layout="column" flex>
+      <strong>
+        <div class="layout">
+          <strong flex='15' ng-if="$ctrl.contentType == 'lessons'">Lesson {{$ctrl.content.sequenceNumber}}:</strong>
+          <a flex href="{{$ctrl.url}}">{{$ctrl.currentInstance.name}}</a>
+        </div>
+      </strong>
+      <br />
+      <div class="description">
+        <div class="lesson-parents-info">
+          <div class="parents" ng-if="$ctrl.contentType == 'lessons'">
+            <div layout>
+              <strong flex='15'>Category:</strong> <span flex>{{$ctrl.getParentsForCurrentLessonInstance().categoryInstance.name}}</span>
+            </div>
+            <div layout>
+              <strong flex='15'>Subject:</strong> <span flex>{{$ctrl.getParentsForCurrentLessonInstance().subjectInstance.name}}</span>
+            </div>
+            <div layout>
+              <strong flex='15'>Course:</strong> <span flex>{{$ctrl.getParentsForCurrentLessonInstance().courseInstance.name}}</span>
+            </div>
+          </div>
+          <div class="description" ng-if="$ctrl.contentType != 'lessons'">{{$ctrl.getDescription($ctrl.currentInstance)}}</div>
+        </div>
+      </div>
+      <br />
+      <md-card-footer layout="row" layout-align="start center">
+        <div class="duration">
+          <span>
+            <span>Duration: </span>
+            <span>{{($ctrl.content.duration || $ctrl.duration) | timeDisplay}}</span>
+          </span>
+        </div>
+      </md-card-footer>
+      </div>
+      <div class="right">
+        <div ng-show="$ctrl.instances.length == 1" class="single-language">
+          <span class="iso-code md-caption">{{$ctrl.getInstanceLanguage($ctrl.currentInstance)['iso639-1Code']}}</span>
+          <span>- {{$ctrl.getInstanceLanguage($ctrl.currentInstance).nativeName}}</span>
+        </div>
+        <md-input-container class="language-select multi-language md-body-1">
+          <md-select ng-model="$ctrl.currentInstance.id" aria-label="Select language" ng-show="$ctrl.instances.length &gt; 1">
+            <md-option ng-repeat="instance in $ctrl.instances" ng-value="{{instance.id}}" ng-click="$ctrl.changeInstance(instance)">
+              <div>
+                <span class="iso-code md-caption">{{$ctrl.getInstanceLanguage(instance)['iso639-1Code']}}</span>
+                <span class="native-name">- {{$ctrl.getInstanceLanguage(instance).nativeName}}</span>
+                <admin-overlay visibility-level-id="instance.visibilityLevel" fade="false"></admin-overlay>
+              </div>
+            </md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+    </div>
+  </div>
+  <md-divider></md-divider>

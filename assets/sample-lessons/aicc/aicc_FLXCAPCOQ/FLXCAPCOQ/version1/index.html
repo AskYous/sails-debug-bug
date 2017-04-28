@@ -1,0 +1,263 @@
+<!--/* Copyright © 2003-2007 Rustici Software, LLC  All Rights Reserved. www.scorm.com */-->
+<HTML>
+	<HEAD>
+		<TITLE>eLC_CAP_Cost of Quality</TITLE>
+		<script language="JavaScript1.2" src="scormdriver.js"></script>
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="standard.js" language="JavaScript1.2"></script>
+		
+		
+		
+		<script language="JavaScript1.2">
+		var g_bIsInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
+		var SD = window; // setup a reference to the SD
+		// this is the flag for triggering the custom comms
+		SD.AICC_USE_CUSTOM_COMMS = true;
+		//ShowDebugWindow();
+		
+		var num_tries = 0;
+		var total_tries = 10;
+		var checker;
+		
+		var currentWindow = window;
+		var parentWindow = window.parent;
+		var topWindow = window.top;
+		try
+		{
+			if(parentWindow.document)
+				var cmt = "tring to access document of parent window";
+		}
+		catch(e)
+		{
+			parentWindow = currentWindow;
+		}
+		try
+		{
+			if(topWindow.document)
+				var cmt = "tring to access document of top window";
+		}
+		catch(e)
+		{
+			topWindow = currentWindow;
+			try
+			{
+				while(topWindow.parent.document)
+					topWindow = topWindow.parent;
+			}
+			catch(e)
+			{}
+		}
+		
+		function LoadContent(){
+			//	Do nothing - this function is required by the driver
+			document.getElementById('scormdriver_content').contentWindow.LoadContent();
+		}
+		
+		
+		function OnLoad_Activities(){
+			checker = setInterval(CheckForAICCComm,100);
+			RegisterForCloseOnTopWindow();
+		}
+				
+		
+		function defineCustomAICCCommunication()
+		{
+		
+			// override this function from the SCORM Driver to handle the custom comms
+			//aghose: this one is in AICCComm 
+			window.CustomAICCCommunication = function(strAICCURL, strPostData, strRequestType, strCallBack) {
+					
+					WriteToDebug('in MakeHttpPostCall');
+					WriteToDebug('Details of Call:');
+					WriteToDebug("AICCURL:"+String(strAICCURL));
+					WriteToDebug("Post Data:"+strPostData);
+					WriteToDebug("RequestType:"+strRequestType);
+					WriteToDebug("CallBack:"+strCallBack);
+					WriteToDebug("---End Details of Call---");
+					
+					document.getElementById('AICCPostRouter').contentWindow.makeHTTPPost(String(strAICCURL), strPostData, strRequestType, strCallBack);
+					
+					return;
+					
+					
+					
+					var CaptivateAICCMovie = document.getElementById('AICCPostRouter').contentWindow.Captivate;       
+					
+					CaptivateAICCMovie =  window.frames["AICCPostRouter"].document.getElementById('Captivate');
+					WriteToDebug("CaptivateAICCMovie:"+CaptivateAICCMovie);
+					
+					
+					
+					//var x =  window.frames["AICCPostRouter"].document.getElementById('Captivate');
+					//console.log("Trying to obtain movie using frames elements:"+x);
+					
+					if(typeof CaptivateAICCMovie == 'object'){
+						CaptivateAICCMovie.makeHTTPPost(String(strAICCURL), strPostData, strRequestType, strCallBack);
+					}
+				}
+		}
+
+		var unloaded = false;
+		function BeforeUnload()			
+		{
+			if(unloaded == true)
+			{
+				if(document.getElementById('AICCPostRouter') && document.getElementById('AICCPostRouter').contentWindow)
+					document.getElementById('AICCPostRouter').contentWindow.flushQueue();
+				return;
+			}
+			unloaded = true;
+			document.getElementById('scormdriver_content').contentWindow.flushQueue();
+			Unload();
+			document.getElementById('AICCPostRouter').contentWindow.flushQueue();
+			Finish();		
+		}
+		
+		window.onbeforeunload = function() { 
+			WriteToDebug("In Before Unload");
+			BeforeUnload();
+		}
+		
+		window.onunload = function() {
+			WriteToDebug("In index Unload");
+			document.getElementById('AICCPostRouter').contentWindow.flushQueue();
+		}
+		
+		function DoCPExit()
+		{
+			if(window != parentWindow && parentWindow && parentWindow["DoCPExit"] !== undefined )
+			{
+				parentWindow.DoCPExit();
+			}
+			else
+			{
+				if(topWindow == self)
+				{
+					var win = window.open("","_self");
+					win.close();
+				}
+				else
+				{
+					var win = topWindow.open("","_self");
+					win.top.close();
+				}
+			}
+		}
+		
+		
+		//for adobe
+		function InitializeCalls()
+		{
+			
+			WriteToDebug("In InitializeCalls()");
+			
+			//this has to be here for the Router SWF- this is the first call it makes
+			//now load the actual content SWF
+			document.getElementById('scormdriver_content').contentWindow.EmbedSWF();
+		
+		}
+
+		function CheckForAICCComm(){
+			
+			num_tries += 1;
+			WriteToDebug("CP: In CheckForAICCComm, trial num: " + num_tries);
+			
+			if(num_tries > total_tries){
+				WriteToDebug("CP: In CheckForAICCComm exceeded total tries...aborting further calls to this function.");
+				clearInterval(checker);
+				return;
+			}
+			
+			if(typeof(window.AICCComm.MakeGetParamRequest) == 'function'){
+				WriteToDebug("CP: AICCComm has been initialized.");
+				clearInterval(checker);
+				
+				if(window.AICCComm.blnAppearsToBeCrossDomain == true)
+					document.getElementById('AICCPostRouter').contentWindow.EmbedSWF();
+				else
+					document.getElementById('scormdriver_content').contentWindow.EmbedSWF();
+				
+				defineCustomAICCCommunication();
+				
+				
+				
+			}
+		}
+		
+	
+		//create the callback that we're passing through
+		window.ProcessLMSResult = function(requestType, responseStr)
+		{
+			WriteToDebug("In ProcessLMSResult with:"+requestType+","+responseStr);
+			//catch the callback from the SWF and pass it along to the AICCComm frame
+			window.AICCComm.ProcessLMSResult(requestType, responseStr);			
+		};
+		
+		var oldBeforeUnloadHandler = null;
+		var oldUnloadHandler = null;
+
+		function CPDoBeforeUnload()
+		{
+			if(window.onbeforeunload)
+				window.onbeforeunload();
+
+			if(oldBeforeUnloadHandler)
+				oldBeforeUnloadHandler();		
+		}
+
+		function CPDoUnload()
+		{
+			if(window.onunload)
+				window.onunload();
+			if(oldUnloadHandler)
+				oldUnloadHandler();		
+		}
+		
+		function RegisterForCloseOnTopWindow()
+		{
+			if(isIE && topWindow && topWindow != window.self)
+			{
+				var targetWin = topWindow;
+				if(targetWin.onbeforeunload)
+				{
+					if(targetWin.onbeforeunload != window.onbeforeunload)
+					{
+						oldBeforeUnloadHandler = targetWin.onbeforeunload;
+					}
+				}
+				if(targetWin.onunload)
+				{
+					if(targetWin.onunload != window.onunload)
+					{
+						oldBeforeUnloadHandler = targetWin.onunload;
+					}
+				}
+				targetWin.onbeforeunload = CPDoBeforeUnload;
+				targetWin.onunload = CPDoUnload;
+			}
+		}
+
+		function isIE()
+		{
+			var agt=navigator.userAgent.toLowerCase();
+			var is_ie     = ((agt.indexOf("msie") != -1) && (agt.indexOf("opera") == -1));
+			return is_ie;
+		}
+		
+
+		
+		
+		</script>
+	</HEAD>
+	<frameset rows="100%,0%,0%,0%,0%" onload="OnLoad_Activities()" border="0" onbeforeunload="BeforeUnload()" onunload="BeforeUnload()">
+		<frame id ="scormdriver_content" name="scormdriver_content" src="eLC_CAP_CostOfQuality_v1.2.htm">
+		<frame name="AICCComm" src="AICCComm.html">
+		<frame name="rusticisoftware_aicc_results" src="blank.html">
+		<frame name="NothingFrame" src="blank.html">
+		<frame id="AICCPostRouter" name="AICCPostRouter" src="AICCPostRouter.html">
+		
+	</frameset>
+	<noframes>
+		Your browser must be able to view frames for this content to display.
+	</noframes>
+</HTML>

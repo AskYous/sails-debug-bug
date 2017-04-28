@@ -1,0 +1,33 @@
+// out: ../dist/home.css, sourcemap: true, compress: false
+@primaryColor: #00B2FD;
+
+body,
+html,
+[ng-view] {
+  background-color: #E8E6E7;
+}
+
+.top {
+  background-image: url('/images/home/dark-table-texture_sm.jpg');
+  background-size: 100%;
+  padding: 30px 0;
+
+  video-player {
+    width: 800px;
+  }
+
+}
+
+@media (max-width: 600px) {
+  category-tile{
+    height: 125px;
+  }
+}
+.middle {
+  background-color: #E8E6E7;
+  @media (max-width: 600px) {
+    .carousel {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,49 @@
+// out: ../dist/search.css, sourcemap: true, compress: false
+#view-search{
+  .top {
+    .query{
+      font-style: italic;
+      color: gray;
+    }
+  }
+  .bottom {
+    .results{
+      padding: 0;
+    }
+    .result{
+      md-toolbar{
+        background-color: #313131;
+        color: white;
+        height: 40px;
+        .md-button{
+          margin: 0;
+          md-icon{
+            color: #00B2FD;
+          }
+        }
+        .md-toolbar-tools{
+          padding-right: 0;
+        }
+      }
+      a {
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .default{
+        img{
+          width: 100%;
+        }
+      }
+    }
+    md-toolbar {
+      min-height: 0px;
+      padding: 0;
+      .md-toolbar-tools {
+        font-size: 18px;
+        height: 50px;
+      }
+    }
+  }
+}

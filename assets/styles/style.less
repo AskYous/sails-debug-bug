@@ -1,0 +1,219 @@
+// out: ../dist/style.css, sourcemap: true, compress: true
+@pageWidth: 1024px;
+@bodyBgColor: lightGray;
+@lightGray: #333;
+@disabled: #ccc;
+@primaryColor: #00B2FD;
+
+.no-padding, .no-padding a {
+  padding: 0;
+}
+.no-margin, .no-margin a {
+  margin: 0;
+}
+
+body, section[ng-view]{
+  background-color: @bodyBgColor;
+  display: block;
+}
+section[ng-view] {
+  md-content.main, md-card.main{
+    min-width: 1024px;
+  }
+}
+md-menu-content.logged-in-menu{
+  color: white;
+  md-icon{
+    color: white;
+    width: 10px;
+  }
+}
+md-menu-content.browse-courses {
+  padding: 0;
+  width: 600px;
+  // height: 500px;
+  max-height: 500px;
+  background-color: #ccc;
+  md-content, .active {
+    background-color: #f4f4f4;
+  }
+  .subjects {
+    .subject{
+      text-transform: none;
+      text-align: left;
+    }
+    .see-all{
+      background-color: #333;
+      color: white;
+      text-transform: none;
+    }
+  }
+}
+
+.tile {
+  text-align: center;
+  width: 200px;
+  height: 200px;
+  color: white !important;
+  opacity: 0.9;
+  margin: 0;
+  padding: 0 15px;
+  border-radius: 0;
+  // xs devices
+  @media (max-width: 600px) {
+    height: inherit;
+    text-align: left;
+    padding: 0;
+
+    md-icon {
+      border-right: 1px ridge white;
+    }
+  }
+
+  md-icon {
+    @iconsize: 70px;
+    font-size: @iconsize;
+    width: @iconsize;
+    height: @iconsize;
+    color: white;
+    display: inline-block;
+  }
+
+  .title {
+    word-wrap: break-word;
+    white-space: normal;
+    line-height: 24px;
+    width: 100%;
+  }
+}
+md-list-item.active {
+  background-color: #f4f4f4;
+}
+md-menu-content {
+  background-color: #1e1916;
+  .mobile-menu{
+    color: white;
+    md-icon {
+      margin: inherit;
+      color: @primaryColor !important;
+    }
+  }
+
+  md-list{
+    padding: 0;
+  }
+}
+
+header {
+
+  md-menu{
+    margin: inherit !important;
+  }
+
+  .mobile-menu {
+    overflow: hidden;
+    transition: .5s;
+    -webkit-transition: .5s;
+    position: absolute;
+  }
+
+  md-toolbar {
+
+    &.main {
+
+      background-color: black;
+
+      .ondemand-logo .md-button{
+        vertical-align: middle;
+        font-size: 20px;
+        color: white;
+        text-transform: none;
+        padding: 15px;
+
+        img {
+          max-height: 60px;
+          vertical-align: sub;
+        }
+      }
+
+      button * {
+        color: @primaryColor !important;
+      }
+
+    }
+
+    &.secondary {
+
+      background-color: @lightGray;
+      * { color: white !important; }
+
+      md-icon {
+        color: @primaryColor !important;
+      }
+
+      .md-errors-spacer { display:none; }
+
+      input { border-bottom-color: white; }
+    }
+  }
+}
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+img#profile-pic{
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+}
+
+
+footer {
+  background: black;
+  color: @primaryColor;
+
+  md-icon {
+    color: @primaryColor;
+  }
+}
+
+// Material guidelines says 840 is a large tablet portrait mode
+@media (max-width: 840px) {
+  footer .desktop-only { display: none };
+  .large-screen { display:none; }
+}
+@media (min-width: 840px) {
+  .small-screen { display:none }
+  footer .mobile-only { display: none !important; }
+}
+
+.container {
+  max-width: @pageWidth;
+  margin: 0 auto;
+}
+
+md-list-item[disabled]{
+  color: @disabled;
+}
+
+.sixteen-nine {
+  position: relative;
+}
+.sixteen-nine:before {
+  display: block;
+  content: "";
+  width: 100%;
+  padding-top: 56.25%;
+}
+.sixteen-nine > .content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

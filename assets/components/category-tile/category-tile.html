@@ -1,0 +1,7 @@
+
+<md-button layout="column" layout-padding="" layout-xs="row" flex-xs="100" ng-href="{{$ctrl.url}}" ng-style="{ backgroundColor: $ctrl.category.color }" class="tile">
+  <h3 flex-order-xs="2" class="title">{{$ctrl.category.name}}</h3>
+  <md-icon ng-if="!$ctrl.category.thumbnailUrl" flex-order-xs="1">{{$ctrl.category.materialIcon}}</md-icon>
+  <img ng-src="{{$ctrl.category.thumbnailUrl}}" ng-if="$ctrl.category.thumbnailUrl"/>
+</md-button>
+<admin-overlay visibility-level-id="$ctrl.category.visibilityLevel"></admin-overlay>

@@ -1,0 +1,42 @@
+// out: ../../dist/content-row.css, sourcemap: true, compress: true
+@primaryColor: #00B2FD;
+content-row{
+  a {
+    color: @primaryColor;
+    text-decoration: none;
+  }
+  .content-card{
+    margin: 8px 0;
+    .top {
+      // margin-bottom: 10px;
+    }
+    .single-language{
+      font-size: 16px;
+    }
+    .multi-language{
+      margin: 0;
+      font-size: 16px;
+    }
+    img {
+      width: 200px;
+    }
+    .thumbnail-caption{
+      display: block;
+      font-size: 14px;
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+      opacity: .8;
+    }
+    md-card-title{
+      padding-top: 10px;
+      padding-bottom: 0;
+    }
+    md-card-title, md-card-footer{
+      padding-left: 0;
+    }
+    .description {
+      line-height: 20px;
+    }
+  }
+}

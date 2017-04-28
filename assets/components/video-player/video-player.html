@@ -1,0 +1,49 @@
+
+<link rel="stylesheet" href="/dist/video-player.css"/>
+<div id="video-container" ng-init="$ctrl.init()" class="video-container no-padding">
+  <div class="player">
+    <video flex="auto" ng-show="$ctrl.useVideoTag()" class="main-video content" poster="{{$ctrl.poster}}">
+      <source type="video/mp4"/>
+      <p class="fallback">Your browser doesn't support HTML5. Please upgrade to a more modern browser to watch videos.</p>
+    </video>
+    <iframe border="0" ng-show="$ctrl.useIFrameTag()" class="main-video HTML-lesson content"></iframe>
+    <div layout="column" layout-align="center center" ng-if="$ctrl.error" class="main-video error">
+      <md-icon>sentiment_dissatisfied</md-icon><span class="message">Error playing video. That's all we can tell you. <br/><span>You can contact us </span><a href="mailto:Yousef.Shanawany@Flextronics.com?Subject=I found a bug!">here</a><span> to report this error.</span><br/><br/><span>(The console log has more details.)</span></span>
+    </div>
+  </div>
+  <div layout="row" layout-align="space-around center" class="controls">
+    <md-button aria-label="Toggle mute" ng-click="$ctrl.rewindToZero()" ng-if="$ctrl.usesPlayBar" class="rewind-to-zero-button md-icon-button">
+      <md-icon>fast_rewind</md-icon>
+    </md-button>
+    <md-button ng-if="$ctrl.skipping &amp;&amp; $ctrl.usesPlayBar" ng-click="$ctrl.skipBack()" class="skip-back md-icon-button">
+      <md-icon>replay_10</md-icon>
+    </md-button>
+    <md-button ng-if="$ctrl.usesPlayBar" aria-label="Toggle play" ng-click="$ctrl.togglePlay()" class="play-button md-icon-button">
+      <md-icon ng-hide="$ctrl.isPlaying()">play_arrow</md-icon>
+      <md-icon ng-show="$ctrl.isPlaying()">pause</md-icon>
+    </md-button>
+    <md-button ng-if="$ctrl.skipping &amp;&amp; $ctrl.usesPlayBar" ng-click="$ctrl.skipForward()" class="skip-forward md-icon-button">
+      <md-icon>forward_10</md-icon>
+    </md-button>
+    <div ng-if="$ctrl.usesPlayBar" layout="row" layout-align="center center" layout-padding="" class="time-indicator md-caption">{{$ctrl.currentTime | timeDisplayFriendly}} / {{$ctrl.duration | timeDisplayFriendly}}</div>
+    <div flex="flex" ng-if="$ctrl.usesPlayBar" ng-mouseup="$ctrl.mouseup($event)" ng-mousedown="$ctrl.mousedown($event)" ng-mousemove="$ctrl.mousemove($event)" ng-mouseenter="$ctrl.mouseenter($event)" ng-mouseleave="$ctrl.mouseleave($event)" layout="layout" layout-align="center center" layout-padding="layout-padding" class="progress-bar-container"><span flex="" class="space"></span>
+      <!-- The progress bar-->
+      <div id="progress-bar" tabindex="-1">
+        <div id="progress-meter" ng-style="{ width: $ctrl.scrubLeft + '%'}"></div>
+      </div><span flex="" class="space"></span>
+    </div>
+    <md-button aria-label="Toggle mute" ng-click="$ctrl.toggleMute()" ng-if="$ctrl.usesPlayBar" class="mute-button md-icon-button">
+      <md-icon ng-hide="$ctrl.isMuted()">volume_up</md-icon>
+      <md-icon ng-show="$ctrl.isMuted()">volume_off</md-icon>
+    </md-button>
+    <md-button ng-if="$ctrl.shareUrl" ng-href="{{$ctrl.shareUrl}}" class="share md-icon-button">
+      <md-icon>share</md-icon>
+    </md-button>
+    <md-button ng-if="$ctrl.feedbackUrl" ng-href="{{$ctrl.feedbackUrl}}" class="feedback md-icon-button">
+      <md-icon>feedback</md-icon>
+    </md-button>
+    <md-button ng-click="$ctrl.toggleFullScreen()" aria-label="Toggle fullscreen" ng-if="$ctrl.fullScreenAvailable()" class="fullscreen-button md-icon-button">
+      <md-icon>fullscreen</md-icon>
+    </md-button>
+  </div>
+</div>

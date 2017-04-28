@@ -1,0 +1,30 @@
+<HTML>
+	<HEAD>
+		<script language="JavaScript1.2">
+		function makePendingPost(url,data)
+		{
+			var aryTemp = data.split("&");
+			var keyObject = new Object;
+			for(var intTemp=0;intTemp < aryTemp.length; intTemp++)
+			{
+				var strPair = aryTemp[intTemp].split("=");
+				if(strPair.length==2)
+				{
+					keyObject[unescape(strPair[0])] = unescape(strPair[1]); 						
+				}
+			}
+			var formInputString = "";
+			for(var key in keyObject)
+			{
+				formInputString += ("<input type='hidden' name='" + key + "' value='"+ keyObject[key] +"'>");
+			}
+			document.getElementById("formHolder").innerHTML = "<form action='"+url+"' method='post'>"+formInputString+"</form>";
+			window.document.forms[0].submit();
+		}
+		</script>
+	</HEAD>
+	<BODY>
+		<div id="formHolder">
+		</div>
+	</BODY>
+</HTML>

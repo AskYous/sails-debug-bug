@@ -1,0 +1,4 @@
+
+<div id="breadcrumbs"><span ng-repeat="item in $ctrl.breadcrumbs track by $index" class="breadcrumb"> 
+    <md-button ng-href="{{item.url}}" class="md-primary">{{item.name}}</md-button><span ng-if="$index != $ctrl.breadcrumbs.length - 1">/</span></span><span flex="flex"></span></div>
+<md-divider style="padding: 0"></md-divider>

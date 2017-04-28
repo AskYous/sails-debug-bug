@@ -1,0 +1,21 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/**.js.map": true,
+        ".tmp": true,
+        "**/**.js": {
+            "when": "$(basename).ts"
+        }
+    },
+    "editor.rulers": [
+        140
+    ],
+    "tslint.autoFixOnSave": true,
+    "typescript.implementationsCodeLens.enabled": true,
+    auto
+}

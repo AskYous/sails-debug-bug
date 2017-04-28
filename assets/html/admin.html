@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Angular Material-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <link rel="stylesheet" href="/dist/admin.css">
+    <title>Fly High Training Admin</title>
+    <style type="text/css">
+      md-list-item.active {
+        background-color: rgba(158,158,158,0.2);
+      }
+      md-list-item a{
+        margin: 0 !important;
+      }
+    </style>
+  </head>
+  <body ng-app="OnDemand4Admin" layout="column">
+    <!-- Header-->
+    <md-toolbar layout="row" class="header md-toolbar-tools"><span>Fly High Training Admin</span><span flex></span>
+      <md-button href="/" aria-title="Exit to app" title="Exit to app" class="md-icon-button"> 
+        <md-icon>exit_to_app</md-icon>
+      </md-button>
+    </md-toolbar>
+    <div layout="row" flex="" class="container">
+      <md-sidenav md-is-locked-open="true" class="left-menu md-whiteframe-z2">
+        <md-list ng-controller="sideNavCtrl as sn">
+          <md-list-item ng-repeat="listItem in sn.listItems track by $index" ng-href="{{sn.getHref(listItem)}}" ui-sref="{{sn.isActiveMenuItem(listItem)}}" ng-class="{ active: sn.isActiveMenuItem(listItem) }">
+            <md-icon class="md-avatar md-36">{{listItem.icon}}</md-icon>
+            <p>{{$index}} - <strong>{{listItem.name}}</strong></p>
+            <md-divider inset></md-divider>
+          </md-list-item>
+        </md-list>
+      </md-sidenav>
+      <!-- Main container-->
+      <md-content layout="column" ng-view="" flex></md-content>
+    </div>
+    <!-- Angular Material requires these libraries-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-route.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <!-- Custom JS-->
+    <script src="/js/classes/CRUD.js" charset="utf-8"></script>
+    <script src="/js/classes/Action.js" charset="utf-8"></script>
+    <script src="/js/classes/Analytic.js" charset="utf-8"></script>
+    <script src="/js/classes/Analytics.js" charset="utf-8"></script>
+    <!-- Angular App (Custom code)-->
+    <script src="/js/admin/app.js" charset="utf-8"></script>
+    <script src="/js/admin/admin-routes.js" charset="utf-8"></script>
+    <script src="/js/admin/controllers.js" charset="utf-8"></script>
+    <script src="/js/admin/directives.js" charset="utf-8"></script>
+  </body>
+</html>

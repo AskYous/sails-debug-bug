@@ -1,0 +1,45 @@
+// out: ../dist/category.css, sourcemap: true, compress: true
+// main: ../styles/styles.less
+@darkGray: black;
+@mediumGray: #333;
+@lightGray: #f4f4f4;
+@primaryColor: #00B2FD;
+
+.category{
+  a {
+    color: @primaryColor;
+    text-decoration: none;
+  }
+  .heading{
+    padding-top: 0px;
+  }
+  .left {
+    padding-right: 8px;
+    .categories {
+      md-list-item, .md-list-item-inner{
+        min-height: inherit;
+        color: @primaryColor;
+      }
+      a {
+        margin: 0;
+      }
+      .active {
+        font-weight: bold;
+        background-color: rgba(158,158,158,0.2);
+      }
+    }
+  }
+
+  .left, .right {
+    md-toolbar{
+      padding: 0;
+      background-color: @lightGray;
+      color: black;
+      min-height: 0;
+      .md-toolbar-tools {
+        font-size: 18px;
+        height: 50px;
+      }
+    }
+  }
+}

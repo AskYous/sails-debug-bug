@@ -1,0 +1,45 @@
+<link href="dist/search.css" type="text/css" rel="stylesheet" />
+<md-content id="view-search" layout="column" layout-padding="layout-padding" ng-controller="searchCtrl as ctrl" class="container">
+  <div layout="row" class="top" layout-align="space-between center">
+    <span class="md-display-1">Search:</span>&nbsp;<span class="md-display-1 query">{{ctrl.query}}</span>
+    <div flex></div>
+    <md-input-container style="margin: 0">
+      <md-select ng-model="ctrl.selectedLanguage" ng-change="ctrl.onLanguageSelect()">
+        <md-option ng-value="language" ng-repeat="language in ctrl.resultLanguages">
+          <span class="iso-code md-caption">{{language['iso639-1Code']}}</span>
+          <span>- {{language.nativeName}}</span>
+        </md-option>
+      </md-select>
+    </md-input-container>
+  </div>
+  <div class="bottom results">
+    <md-progress-linear flex="flex" md-mode="query" ng-show="ctrl.status === 'searching'" class="loading-bar"></md-progress-linear>
+    <div layout="column" class="left">
+      <md-toolbar layout class="top-toolbar">
+        <div class="md-toolbar-tools">Search Results</div>
+        <div flex="flex"></div>
+        <div flex="15" layout layout-align="center center">
+          <div ng-show="ctrl.status === 'searching'">Searching...</div>
+          <div ng-show="ctrl.status === 'success'" style="white-space: nowrap">{{ctrl.numOfResults}} Result<span ng-show="ctrl.numOfResults &gt; 1">s</span></div>
+        </div>
+      </md-toolbar>
+      <md-content ng-repeat="result in ctrl.results" layout="column" class="result">
+        <md-toolbar>
+          <div layout="layout" class="md-toolbar-tools">
+            <div flex="flex">{{result.type}} ({{result.values.length}})</div>
+            <md-button ng-if="result.show" ng-click="result.show = !result.show" class="md-buton-icon">
+              <md-icon>expand_more</md-icon>
+            </md-button>
+            <md-button ng-if="result.show == false" ng-click="result.show = !result.show" class="md-buton-icon">
+              <md-icon>expand_less</md-icon>
+            </md-button>
+          </div>
+        </md-toolbar>
+        <md-content layout="column" ng-show="result.show" class="values">
+          <content-row ng-if="result.ready" class="result" content="result.value" content-type="result.type" ng-repeat="result in result.values"
+            thumbnail-caption="result.thumbnailCaption" data-tc="{{result.thumbnailCaption}}"></content-row>
+        </md-content>
+      </md-content>
+    </div>
+  </div>
+</md-content>

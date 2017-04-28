@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tincan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://projecttincan.com/tincan.xsd">
+	<activities>
+		<activity id="62WL4yBZY2R_course_id" type="course">
+			<name lang="und">eLearningLocker_TinCanAPI_Test</name>
+			<description lang="und" />
+			<launch lang="und">story.html</launch>
+		</activity>
+		<activity id="6Xiom9MCkvs" type="objective">
+			<name lang="und">eLearningLocker_TinCanAPI_Test</name>
+			<description lang="und">eLearningLocker_TinCanAPI_Test</description>
+		</activity>
+		<activity id="6Rytd5x4pdm" type="module">
+			<name lang="und">Introduction</name>
+			<description lang="und">Introduction</description>
+		</activity>
+		<activity id="6b7ft2znGe2" type="module">
+			<name lang="und">Objectives</name>
+			<description lang="und">Objectives</description>
+		</activity>
+		<activity id="637zA0SBaYz" type="module">
+			<name lang="und">Is this the first question?</name>
+			<description lang="und">Is this the first question?</description>
+		</activity>
+		<activity id="637zA0SBaYz.5XFB2sqo7ln" type="cmi.interaction">
+			<name lang="und">Is this the first question?</name>
+			<description lang="und">Is this the first question?</description>
+			<interactionType>choice</interactionType>
+			<correctResponsePatterns>
+				<correctResponsePattern>choice_6GEMB7na2bB</correctResponsePattern>
+			</correctResponsePatterns>
+			<choices>
+				<component>
+					<id>choice_6GEMB7na2bB</id>
+					<description lang="und">Yes (correct)</description>
+				</component>
+				<component>
+					<id>choice_6hM2n9VrKJ1</id>
+					<description lang="und">No</description>
+				</component>
+				<component>
+					<id>choice_5ikb2bS66m7</id>
+					<description lang="und">Both A and B</description>
+				</component>
+			</choices>
+		</activity>
+		<activity id="5owITYFkZgG" type="module">
+			<name lang="und">Is this the second question?</name>
+			<description lang="und">Is this the second question?</description>
+		</activity>
+		<activity id="5owITYFkZgG.6iys8Oi5Smx" type="cmi.interaction">
+			<name lang="und">Is this the second question?</name>
+			<description lang="und">Is this the second question?</description>
+			<interactionType>choice</interactionType>
+			<correctResponsePatterns>
+				<correctResponsePattern>choice_69HEqmwMkpE</correctResponsePattern>
+			</correctResponsePatterns>
+			<choices>
+				<component>
+					<id>choice_5vvtFppM3pi</id>
+					<description lang="und">No</description>
+				</component>
+				<component>
+					<id>choice_69HEqmwMkpE</id>
+					<description lang="und">Yes (correct)</description>
+				</component>
+			</choices>
+		</activity>
+		<activity id="6mu9mL48xRC" type="module">
+			<name lang="und">Results Slide</name>
+			<description lang="und">Results Slide</description>
+		</activity>
+		<activity id="6FmZUO6reWr" type="module">
+			<name lang="und">Product Features</name>
+			<description lang="und">Product Features</description>
+		</activity>
+		<activity id="6A8YhRGSwrB" type="module">
+			<name lang="und">Transition</name>
+			<description lang="und">Transition</description>
+		</activity>
+		<activity id="6KhX5fdsrAw" type="module">
+			<name lang="und">Objectives</name>
+			<description lang="und">Objectives</description>
+		</activity>
+	</activities>
+</tincan>

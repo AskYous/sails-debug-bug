@@ -1,0 +1,47 @@
+// out: ../../dist/category-tile.css, sourcemap: true, compress: true
+category-tile {
+  position: relative;
+  a {
+    display: flex !important;
+  }
+
+  .tile {
+    text-align: center;
+    width: 200px;
+    height: 200px;
+    color: white;
+    opacity: 0.9;
+    margin: 0;
+    padding: 0 15px;
+    border-radius: 0;
+    // xs devices
+    @media (max-width: 600px) {
+      height: inherit;
+      min-height: 100px;
+      text-align: left;
+      padding: 0;
+
+      md-icon, img {
+        border-right: 1px ridge white;
+      }
+    }
+
+    md-icon, img {
+      @iconsize: 70px;
+      font-size: @iconsize;
+      width: @iconsize;
+      height: @iconsize;
+      color: white;
+      display: inline-block;
+      margin: auto;
+    }
+
+    .title {
+      word-wrap: break-word;
+      white-space: normal;
+      line-height: 24px;
+      width: 100%;
+    }
+  }
+
+}

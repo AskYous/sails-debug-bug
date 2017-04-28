@@ -1,0 +1,65 @@
+
+<div ng-controller="modelListCtrl as ctrl" flex="flex" layout="column">
+  <div layout="row" style="min-height: 48px;" layout-padding="layout-padding" class="heading">
+    <h2 flex="flex" style="margin: 0">{{ctrl.model.name}} ({{ctrl.model.items.length}})</h2>
+    <md-button ng-href="#/{{ctrl.model.name}}/Create" aria-label="Add category" class="add-button md-raised md-primary"><span>Add</span></md-button>
+  </div>
+  <md-divider></md-divider>
+  <div layout="row" class="body">
+    <md-content flex="80" class="left">
+      <table class="main-table">
+        <thead>
+          <th ng-repeat="(attribute, properties) in ctrl.model.attributes" ng-if="ctrl.model.attributes[attribute].show">{{ctrl.getFriendlyAttributeName(attribute, properties)}}</th>
+        </thead>
+        <tbody>
+          <tr id="{{ctrl.highlight == item.id ? &quot;highlighted&quot; : &quot;&quot; }}" ng-repeat="item in ctrl.model.items | filter: ctrl.groupByFilter | filter: ctrl.filter track by $index" ng-class="{ highlighted: ctrl.highlight == item.id}">
+            <td ng-repeat="(attribute, properties) in ctrl.model.attributes" ng-if="ctrl.model.attributes[attribute].show"> 
+              <div ng-if="attribute == &quot;name&quot;" class="name">
+                <md-button aria-label="View" ng-href="#/{{ctrl.model.name}}/details/{{item.id}}" class="name md-primary"> <strong>{{item[attribute]}}</strong></md-button>
+              </div>
+              <div ng-if="attribute != &quot;name&quot;" class="not-name">
+                <div ng-if="!properties.model &amp;&amp; !properties.collection" class="default"><span>{{item[attribute]}}</span></div>
+                <div ng-if="properties.model" class="model">
+                  <md-button ng-href="/admin/#/{{properties.model}}/details/{{item[attribute].id}}" class="md-primary">{{item[attribute].name}}</md-button>
+                </div>
+                <div ng-if="properties.collection" class="collection">
+                  <div ng-if="item[attribute].length &gt; 0" class="has-items">
+                    <md-button ng-href="/admin#/{{properties.collection}}?parent={{item.id}}" class="md-primary"> <span>{{item[attribute].length}} {{attribute}}</span></md-button>
+                  </div>
+                  <div ng-if="item[attribute].length == 0" class="no-items"> 
+                    <md-button ng-disabled="true" class="md-disabled">No {{properties.collection}}</md-button>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </md-content>
+    <md-divider layout="column"></md-divider>
+    <md-content flex="flex" layout="column" layout-padding="layout-padding" class="right">
+      <div layout="row" aria-label="Tabular view" class="title">
+        <div class="md-title">Filters</div>
+        <div layout="column" layout-padding="layout-padding" flex="flex">
+          <md-divider> </md-divider>
+        </div>
+      </div>
+      <md-input-container class="filter search">
+        <input id="filter" ng-model="ctrl.filter" aria-label="filter" autofocus="autofocus"/>
+        <label>Search</label>
+      </md-input-container>
+      <md-input-container ng-if="ctrl.model.groupBy" class="groupByOptions">
+        <label>Select a {{ctrl.model.groupBy}}</label>
+        <md-select ng-model="ctrl.groupByOption" ng-if="ctrl.model.groupBy" aria-label="Select a {{ctrl.model.groupBy}}">
+          <md-option selected="selected" value="all">- All -</md-option>
+          <md-option ng-repeat="option in ctrl.groupByOptions" ng-value="{{option.id}}">{{option.name}}</md-option>
+        </md-select>
+      </md-input-container><br/>
+      <fieldset layout="column" class="attributes-checkboxes">
+        <legend>Attributes</legend>
+        <md-checkbox ng-init="showAll = true" ng-change="ctrl.toggleAllAttributes(showAll)" ng-model="showAll" class="toggle-all"><span>- Toggle all -</span></md-checkbox>
+        <md-checkbox ng-repeat="(attribute, properties) in ctrl.model.attributes" aria-label="{{attribute}}" ng-model="ctrl.model.attributes[attribute].show">{{ctrl.getFriendlyAttributeName(attribute, properties)}} </md-checkbox>
+      </fieldset>
+    </md-content>
+  </div>
+</div>

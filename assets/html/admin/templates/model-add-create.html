@@ -1,0 +1,82 @@
+
+<md-content ng-controller="modelAddCreateCtrl as ctrl" ng-cloak="ng-cloak" layout-padding="layout-padding">
+  <div layout="row" class="top">
+    <h2 class="title"><span ng-if="ctrl.getView() == &quot;create&quot;" class="create">New {{ctrl.getSingular(ctrl.model.modelName)}}</span><span ng-if="ctrl.getView() == &quot;edit&quot;" class="edit">{{ctrl.model.details.name}}</span></h2>
+    <div flex="flex" class="space"></div>
+    <div class="buttons">
+      <md-button ng-click="ctrl.cancel()" aria-label="Cancel" class="md-raised">Cancel</md-button>
+      <md-button ng-if="ctrl.getView() == &quot;edit&quot;" ng-click="ctrl.delete()" aria-label="Delete this category" class="md-warn md-raised">Delete</md-button>
+      <md-button type="submit" aria-label="Edit this category" ng-click="ctrl.save()" class="md-primary md-raised">Save</md-button>
+    </div>
+  </div>
+  <hr style="padding: 0px;"/>
+  <pre ng-show="ctrl.formError" class="errors"> <strong class="top">Uh oh... the server rejected your input. Here's what it returned back:</strong>
+    <md-divider></md-divider><span class="summary">{{ctrl.formError.summary}}</span>
+    <md-divider></md-divider><strong>Full response:</strong>
+    <div class="full-response">{{ctrl.formError | json}}</div></pre>
+  <div class="middle main">
+    <form novalidate="novalidate">
+      <fieldset ng-if="ctrl.useDurationFieldset()" class="duration">
+        <legend>Duration</legend>
+        <div layout="layout">
+          <md-input-container flex="flex" class="hours">
+            <label>Hours</label>
+            <input type="number" ng-model="ctrl.duration.hours" ng-change="ctrl.updateDuration()"/>
+          </md-input-container>
+          <md-input-container flex="flex" class="minutes">
+            <label>Minutes</label>
+            <input type="number" ng-model="ctrl.duration.minutes" ng-change="ctrl.updateDuration()"/>
+          </md-input-container>
+          <md-input-container flex="flex" class="seconds">
+            <label>Seconds</label>
+            <input type="number" ng-model="ctrl.duration.seconds" ng-change="ctrl.updateDuration()"/>
+          </md-input-container>
+          <md-input-container class="duration">
+            <label>Calculated duration</label>
+            <input type="number" ng-model="ctrl.model.details.duration" disabled="disabled"/>
+          </md-input-container>
+        </div>
+      </fieldset>
+      <div ng-repeat="(attrName, attrProperties) in ctrl.attributes" ng-if="ctrl.displayAttribute(attrName, attrProperties) &amp;&amp; !ctrl.attrNeedsDurationFieldset(attrName, attrProperties)" layout="column" class="not-duration">
+        <md-input-container ng-if="ctrl.useMdInputContainer(attrName, attrProperties)">
+          <!-- 'attrName' = Attribute name-->
+          <!-- 'attrProperties' = Attribute details-->
+          <md-tooltip md-direction="top" ng-if="attrProperties.formOptions.description"> <strong>{{attrName}}: </strong><span>{{attrProperties.formOptions.description}}</span></md-tooltip>
+          <label ng-if="!ctrl.doesntNeedLabel(attrProperties.type)"> <span>{{ctrl.getFriendlyAttributeName(attrName, attrProperties)}} </span><span ng-if="ctrl.isRequiredAttribute(attrName)" class="required">*</span>
+            <pre>{{Ctrl.isRequiredAttribute(attrName)}}</pre><span ng-if="attrProperties.type == &quot;datetime&quot;">&nbsp;(Eg: 2016-01-31T15:30:00.000Z)</span><span ng-if="attrProperties.formOptions.example">&nbsp;- (Example:
+              <pre style="display: inline">{{attrProperties.formOptions.example}}</pre><span>)</span></span>
+          </label>
+          <input ng-if="attrProperties.type == 'string'" maxlength="{{attrProperties.maxLength}}" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" type="text" ng-model="ctrl.model.details[attrName]" aria-label="{{attrName}}" class="string"/>
+          <input ng-if="attrProperties.type == 'integer'" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" type="number" ng-model="ctrl.model.details[attrName]" aria-label="{{attrName}}" step="any" class="integer"/>
+          <input ng-if="attrProperties.type == 'datetime'" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" type="datetime" ng-model="ctrl.model.details[attrName]" aria-label="{{attrName}}" class="datetime"/>
+          <input ng-if="attrProperties.type == 'color'" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" type="color" ng-model="ctrl.model.details[attrName]" step="0.01" aria-label="{{attrName}}" class="color"/>
+          <textarea ng-if="attrProperties.type == 'longtext'" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" ng-model="ctrl.model.details[attrName]" class="long-text"> </textarea>
+          <md-chips ng-if="attrProperties.type == 'json'" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" ng-model="ctrl.model.details[attrName]" class="json"></md-chips>
+          <md-checkbox ng-if="attrProperties.type == 'boolean'" ng-readonly="ctrl.readOnlyAttribute(attrName, attrProperties)" ng-required="ctrl.isRequiredAttribute(attrName)" ng-model="ctrl.model.details[attrName]" aria-label="{{attrName}}" class="boolean">{{ctrl.getFriendlyAttributeName(attrName, attrProperties)}}</md-checkbox>
+          <md-chips ng-if="attrProperties.collection &amp;&amp; ctrl.model.details[attrName]" ng-model="ctrl.model.details[attrName]" md-autocomplete-snap="md-autocomplete-snap" class="other-models">
+            <md-autocomplete md-items="item in ctrl.queryCollectionItems(query, attrProperties.collection)" md-search-text="query" md-item-text="item.name" placeholder="Search for {{attrName}}">
+              <md-item-template>{{item.name}}</md-item-template>
+            </md-autocomplete>
+            <md-chip-template><span>{{$chip.name}}</span></md-chip-template>
+          </md-chips>
+        </md-input-container>
+        <div class="no-input-container">
+          <div ng-if="!ctrl.useMdInputContainer(attrName, attrProperties) &amp;&amp; attrProperties.model != null" layout="row" layout-align="center center" class="other-model-auto-complete">
+            <md-autocomplete flex="flex" md-items="item in ctrl.queryCollectionItems(search, attrProperties.model)" md-item-text="item.name" md-selected-item="ctrl.model.details[attrName]" md-search-text="search" placeholder="Search for {{attrProperties.model}}" md-floating-label="{{ctrl.getFriendlyAttributeName(attrName, attrProperties)}} (Use '*' to retrieve all search {{ctrl.getFriendlyAttributeName(attrName, attrProperties)}}.)">
+              <md-item-template>{{item.id}}. {{item.name}}</md-item-template>
+            </md-autocomplete>
+            <md-button ng-href="/admin#/{{attrProperties.model}}/Create" target="_blank" title="Add new {{ctrl.getSingular(attrProperties.model)}}. (Opens in new tab)" class="md-icon-button">
+              <md-icon>add</md-icon>
+            </md-button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div layout="row" layout-padding="layout-padding" class="bottom action-buttons">
+    <md-button ng-click="ctrl.cancel()" aria-label="Cancel" class="md-raised">Cancel</md-button>
+    <md-button ng-if="ctrl.getView() == &quot;edit&quot;" ng-click="ctrl.delete()" aria-label="Delete this category" class="md-warn md-raised">Delete</md-button>
+    <div flex="flex" class="spacing"></div>
+    <md-button type="submit" aria-label="Edit this category" ng-click="ctrl.save()" class="md-primary md-raised">Save</md-button>
+  </div>
+</md-content>

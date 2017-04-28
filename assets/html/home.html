@@ -1,0 +1,16 @@
+
+<link rel="stylesheet" href="dist/home.css" media="screen" title="no title" charset="utf-8"/>
+<link rel="stylesheet" href="dist/category-tile.css" media="screen" charset="utf-8"/>
+<md-content style="width: 100%;">
+  <section ng-controller="topCtrl as ctrl" layout="column" layout-align="center center" class="top">
+    <video-player url="ctrl.videoSettings.url" poster="ctrl.videoSettings.poster"></video-player>
+    <div layout="row" layout-align="center stretch" layout-wrap="" style="margin-top: 30px;" class="tiles">
+      <category-tile ng-repeat="tile in ctrl.tiles | orderBy: &quot;sequenceNumber&quot;" category="tile"></category-tile>
+    </div>
+  </section>
+  <section ng-controller="middleCtrl as ctrl" layout="row" layout-align="center center" layout-padding="layout-padding" class="middle">
+    <div layout="column" layout-align="start stretch" flex="90" class="middle-container">
+      <carousel ng-repeat="carousel in ctrl.carousels" carousel="carousel"></carousel>
+    </div>
+  </section>
+</md-content>

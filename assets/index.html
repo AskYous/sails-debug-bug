@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico?v=2">
+  <!-- Angular Material style sheet-->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+  <!-- Custom CSS-->
+  <link rel="stylesheet" href="/dist/style.css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="/dist/breadcrumb.css">
+  <link rel="stylesheet" href="dist/category.css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="dist/carousel.css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="dist/content-row.css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="dist/admin-overlay.css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="dist/video-player.css" media="screen" charset="utf-8">
+  <title>Fly High Training</title>
+</head>
+
+<body ng-app="OnDemand" layout="column" id="body">
+  <header id="toolbars" ng-controller="toolbarsCtrl as ctrl" class="ng-cloak" ng-cloak>
+    <div class="large-screen-navbar">
+      <md-toolbar class="main">
+        <div class="md-toolbar-tools">
+          <!-- Logo-->
+          <div class="ondemand-logo">
+            <md-button href="/#/" aria-label="OnDemand 4.0"><img src="/images/FHT-Logo_Yellow.png"></md-button>
+          </div>
+          <!-- Space--><span flex=""></span>
+          <!-- Popular-->
+          <md-button aria-label="Popular">
+            <md-icon>stars</md-icon><span> </span><span>Popular</span>
+          </md-button>
+          <!-- New Releases-->
+          <md-button aria-label="New Releases">
+            <md-icon>new_releases</md-icon><span> </span><span>New Releases</span>
+          </md-button>
+          <!-- My Reports-->
+          <md-button aria-label="My Reports">
+            <md-icon>assessment</md-icon><span> </span><span>My Reports</span>
+          </md-button>
+          <!-- My Classroom-->
+          <md-button aria-label="My Classroom">
+            <md-icon>school</md-icon><span> </span><span>My Classroom</span>
+          </md-button>
+        </div>
+      </md-toolbar>
+      <md-toolbar md-scroll-shrink="" class="secondary">
+        <div ng-show="ctrl.showPreSearchBar()" class="menu-items md-toolbar-tools doc-tools">
+          <md-menu ng-cloak="" class="browse-courses">
+            <md-button aria-label="menu" ng-click="ctrl.openMenu($mdOpenMenu, $event)" class="browse-courses-button">
+              <md-icon>menu</md-icon><span> </span><span>Browse Catalog</span>
+            </md-button>
+            <md-menu-content class="browse-courses browse-courses-popup">
+              <div layout layout-padding class="md-title header">Browse Catalog</div>
+              <md-divider></md-divider>
+              <div layout="row" flex="" class="two-columns">
+                <md-list style="padding: 0;" flex="40" class="categories">
+                  <!-- Category-->
+                  <md-list-item ng-class="{ 'no-margin': true, 'active': c.id == ctrl.menu.category.id }" ng-repeat="c in ctrl.categories"
+                    ng-mouseover="ctrl.setMenuCategory(c)" ng-href="{{ctrl.getCategoryUrl(c)}}">
+                    <md-icon>{{c.materialIcon}}</md-icon><span> </span>
+                    <p>{{c.name}}</p>
+                  </md-list-item>
+                </md-list>
+                <md-content layout="column" layout-padding flex="60" class="subjects">
+                  <!-- Category Title-->
+                  <div layout="row" class="md-title"><span flex="">Subjects</span></div>
+                  <!-- Subjects-->
+                  <div layout="column" class="subjects">
+                    <md-button ng-repeat="s in ctrl.menu.category.subjects.slice(0, 3) | orderBy: &quot;name&quot;" ng-href="#/Subject/{{s.id}}"
+                      class="subject">{{s.name}}</md-button>
+                  </div>
+                  <md-button ng-if="ctrl.menu.category.subjects.length &gt; 3" ng-href="#/Category/{{ctrl.menu.category.id}}" class="see-all">
+                    <span>See all</span></md-button>
+                </md-content>
+              </div>
+            </md-menu-content>
+          </md-menu>
+          <div flex class="space"></div>
+          <md-button ng-click="ctrl.initiateSearch()" class="search">
+            <md-icon>search</md-icon><span> </span><span>Search</span>
+          </md-button>
+          <div ng-cloak class="login">
+            <md-button aria-label="menu" ng-click="ctrl.signin()" ng-if="!ctrl.user" class="signin-button">
+              <md-icon>account_box</md-icon><span> </span><span>Sign in</span>
+            </md-button>
+            <md-menu md-position-mode="target-right bottom" class="logged-in-menu-container">
+              <md-button ng-click="ctrl.openUserMenu($mdOpenMenu, $event)" ng-href="#/profile" ng-show="ctrl.user" ng-cloak=""><img id="profile-pic" ng-src="{{ctrl.user.IDPData.picture}}" alt="{{ctrl.user.IDPData.name.givenName}} {{ctrl.user.IDPData.name.familyName}}"
+                  style="vertical-align: middle;" class="md-icon"><span> </span><span>{{ctrl.user.IDPData.name.givenName}} {{ctrl.user.IDPData.name.familyName}}</span></md-button>
+              <md-menu-content class="logged-in-menu">
+                <md-list>
+                  <md-list-item>Edit Profile</md-list-item>
+                  <md-list-item>My Reports</md-list-item>
+                  <md-list-item>Admin View</md-list-item>
+                  <md-list-item>User View</md-list-item>
+                  <md-list-item ng-click="ctrl.signout()">Sign out</md-list-item>
+                </md-list>
+              </md-menu-content>
+            </md-menu>
+          </div>
+        </div>
+        <div id="searchBar" ng-show="ctrl.showSearchBar()" class="md-toolbar-tools">
+          <!-- Submit search button-->
+          <md-button aria-label="close" ng-click="ctrl.submit()" class="md-icon-button">
+            <md-icon>search</md-icon><span> </span>
+          </md-button>
+          <!-- Search Input-->
+          <md-input-container flex="">
+            <form ng-submit="ctrl.submit()">
+              <input id="search" type="text" ng-model="ctrl.search" aria-label="Search" autofocus>
+            </form>
+          </md-input-container>
+          <!-- Close Search-->
+          <md-button aria-label="Search" ng-href="#/search?query={{ctrl.search}}" class="md-icon-button">
+            <md-icon>arrow_forward</md-icon>
+          </md-button>
+          <md-button aria-label="Close" ng-click="ctrl.endSearch()" class="md-icon-button">
+            <md-icon>close</md-icon>
+          </md-button>
+        </div>
+      </md-toolbar>
+    </div>
+    <div class="small-screen">
+      <!-- Main Toolbar-->
+      <md-toolbar class="main">
+        <div layout="row" layout-align="space-between center" class="md-toolbar-tools">
+          <md-menu>
+            <!-- Trigger element is a md-button with an icon-->
+            <md-button ng-click="ctrl.toggleMobileMenu($mdOpenMenu, $event)" aria-label="Open menu" class="md-icon-button">
+              <md-icon>menu</md-icon><span> </span>
+            </md-button>
+            <md-menu-content>
+              <div class="mobile-menu">
+                <md-list><span>
+                      <md-list-item ng-click="ctrl.signin()" ng-if="!ctrl.user">
+                        <md-icon>account_circle</md-icon><span> </span><span>Login</span>
+                  </md-list-item>
+                  <md-divider></md-divider>
+                  <md-list-item ng-click="lc.signin()" ng-if="ctrl.user">
+                    <md-icon><img id="profile-pic" ng-if="ctrl.user" ng-src="{{ctrl.user.IDPData.picture}}" alt="{{ctrl.user.IDPData.name.givenName}} {{ctrl.user.name.IDPData.familyName}}"
+                        class="md-icon"></md-icon><span>{{ctrl.user.IDPData.name.givenName}} {{ctrl.user.IDPData.name.familyName}}</span>
+                  </md-list-item>
+                  <md-divider></md-divider>
+                  </span>
+                  <md-list-item ng-click="ctrl.initiateSearch()">
+                    <md-icon>search</md-icon><span> </span><span>Search</span>
+                  </md-list-item>
+                  <md-divider></md-divider>
+                  <md-list-item ng-click="ctrl">
+                    <md-icon>class</md-icon><span> </span><span>Browse Catalog</span>
+                  </md-list-item>
+                </md-list>
+              </div>
+            </md-menu-content>
+          </md-menu><a href="#/">Fly High Training</a>
+          <div class="right-buttons">
+            <md-button aria-label="search" ng-click="ctrl.initiateSearch()" class="md-icon-button">
+              <md-icon>search</md-icon><span> </span>
+            </md-button>
+          </div>
+        </div>
+      </md-toolbar>
+      <md-toolbar ng-show="ctrl.showSearchBar()" class="secondary">
+        <!-- Search bar-->
+        <div ng-show="ctrl.showSearchBar()" class="md-toolbar-tools">
+          <!-- Submit search button-->
+          <md-button aria-label="close" ng-click="ctrl.submit()" class="md-icon-button">
+            <md-icon>search</md-icon><span> </span>
+          </md-button>
+          <!-- Search Input-->
+          <md-input-container flex="">
+            <input type="text" ng-model="ctrl.search" aria-label="Search">
+          </md-input-container>
+          <!-- Close Search-->
+          <md-button aria-label="Close" ng-click="ctrl.endSearch()" class="md-icon-button">
+            <md-icon>close</md-icon><span> </span>
+          </md-button>
+          <!-- End Search Bar-->
+        </div>
+      </md-toolbar>
+    </div>
+  </header>
+  <section ng-view flex layout="row" layout-align="center start"></section>
+  <footer ng-controller="footerCtrl as ctrl">
+    <div layout layout-padding layout-align="start center" class="desktop-only"><span>© 2017 Fly High Training</span><span flex></span>
+      <md-button href="{{ctrl.contactUsLink}}">
+        <md-icon>mail</md-icon><span>&nbsp;</span><span>Contact</span>
+      </md-button>
+    </div>
+    <div layout="row " layout-align="space-between center " ng-controller="footerCtrl as fc " class="mobile-only footer">
+      <md-button ng-href="http://google.com " aria-label="My Classroom " layout="column " ng-repeat="b in fc.buttons ">
+        <md-icon>{{b.icon}}</md-icon><br><span>{{b.text}}</span>
+      </md-button>
+    </div>
+  </footer>
+  <script src="https://c64.assets-yammer.com/assets/platform_embed.js"></script>
+  <!-- Angular Material requires Angular.js Libraries-->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-animate.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-aria.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-messages.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+  <!-- JQuery-->
+  <script src="/dist/jquery-3.0.0.min.js"></script>
+  <!-- Auth0-->
+  <script src="/dist/lock-9.2.min.js"></script>
+  <!-- Custom Classes-->
+  <script src="/js/classes/Action.js" charset="utf-8"></script>
+  <script src="/js/classes/Analytic.js" charset="utf-8"></script>
+  <script src="/js/classes/Analytics.js" charset="utf-8"></script>
+  <script src="/js/classes/Classes.js" charset="utf-8"></script>
+  <script src="/js/classes/CRUD.js" charset="utf-8"></script>
+  <!-- Custom JS (for angular)-->
+  <script src="/js/app.js" charset="utf-8"></script>
+  <script src="/js/user-routes.js" charset="utf-8"></script>
+  <script src="/js/filters.js" charset="utf-8"></script>
+  <script src="/js/components.js" charset="utf-8"></script>
+  <!-- Angular Controllers-->
+  <script src="/js/controllers/main.js" charset="utf-8"></script>
+  <script src="/js/controllers/footer.js" charset="utf-8"></script>
+  <script src="/js/controllers/search.js" charset="utf-8"></script>
+  <script src="/js/controllers/subject.js" charset="utf-8"></script>
+  <script src="/js/controllers/toolbar.js" charset="utf-8"></script>
+  <script src="/js/controllers/category.js" charset="utf-8"></script>
+  <script src="/js/controllers/home-top.js" charset="utf-8"></script>
+  <script src="/js/controllers/home-middle.js" charset="utf-8"></script>
+  <!-- Angular Components-->
+  <script src="/components/video-player/video-player.js" charset="utf-8"></script>
+  <script src="/components/category-tile/category-tile.js" charset="utf-8"></script>
+  <script src="/components/breadcrumb/breadcrumb.js" charset="utf-8"></script>
+  <script src="/components/carousel/carousel.js" charset="utf-8"></script>
+  <script src="/components/admin-overlay/admin-overlay.js" charset="utf-8"></script>
+</body>
+
+</html>

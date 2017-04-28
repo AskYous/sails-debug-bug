@@ -1,0 +1,109 @@
+md-card.subject-container {
+  margin: 20px auto;
+  padding: 0;
+}
+md-card.subject-container .top {
+  padding-right: 20px;
+}
+md-card.subject-container .top .md-title {
+  padding-left: 15px;
+}
+md-card.subject-container .top .language-container {
+  margin-bottom: 0;
+}
+md-card.subject-container .top * {
+  vertical-align: middle;
+}
+md-card.subject-container .top video-player {
+  min-height: 500px;
+}
+md-card.subject-container .left {
+  border-right: #dddcdd solid 1px;
+}
+md-card.subject-container .left .info {
+  padding-bottom: 0;
+}
+md-card.subject-container .left .info md-list-item {
+  padding: 5px 15px;
+  padding-right: 0;
+  font-size: 12px !important;
+  color: gray;
+}
+md-card.subject-container .left .info md-list-item md-icon,
+md-card.subject-container .left .info md-list-item .md-icon-button {
+  font-size: 16px;
+}
+md-card.subject-container .left .courses {
+  height: 535px;
+  overflow-y: auto;
+}
+md-card.subject-container .left .courses .course.highlighted {
+  background-color: rgba(53, 96, 255, 0.26);
+}
+md-card.subject-container .left .courses .course button.toggle-expansion {
+  margin: 0;
+}
+md-card.subject-container .left .courses .course md-icon.toggle {
+  color: #00B2FD;
+}
+md-card.subject-container .left .courses .course div.name {
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+md-card.subject-container .left .courses .course .lessons .lesson {
+  padding: 0;
+  padding-left: 50px;
+  font-size: 10pt;
+  line-height: 14px;
+  margin-bottom: 0px;
+}
+md-card.subject-container .left .courses .course .lessons .lesson.active {
+  background-color: #e7e7e7;
+}
+md-card.subject-container .left .courses .course .lessons .lesson:hover {
+  cursor: pointer;
+  background-color: #e7e7e7;
+}
+md-card.subject-container .left .courses .course .lessons .lesson .pdf a {
+  color: #b61500;
+}
+md-card.subject-container .left .courses .course .lessons .lesson .watched {
+  color: #00B2FD;
+  font-size: 20px;
+}
+md-card.subject-container .left .courses .course .lessons .lesson .duration {
+  color: gray;
+  margin-top: 5px;
+  font-style: italic;
+}
+md-card.subject-container .left .courses .course .lessons .lesson:first-child {
+  margin-top: 0px;
+}
+md-card.subject-container .right md-tabs,
+md-card.subject-container .right [md-tabs-template],
+md-card.subject-container .right md-content,
+md-card.subject-container .right #yammer-feed {
+  height: 100%;
+}
+md-card.subject-container .right md-content.yammer {
+  overflow-y: hidden;
+}
+md-card.subject-container div.search-container {
+  padding: 7px;
+  background-color: #e7e7e7;
+}
+md-card.subject-container .no-padding {
+  padding: 0;
+}
+md-card.subject-container .search-container .white {
+  background-color: white;
+  border: solid #dddcdd 1px;
+  border-radius: 2px;
+  padding: 2px;
+}
+md-card.subject-container .search-container .white input {
+  padding: 5px;
+  border: 0;
+}

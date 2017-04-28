@@ -1,0 +1,942 @@
+<!-- Copyright [2012] Adobe Systems Incorporated.  All rights reserved -->
+<!-- saved from url=(0013)about:internet -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<link rel="stylesheet" type="text/css" href="captivate.css" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>eLC_CAP_Cost of Quality</title>
+		<script src="standard.js" type="text/javascript"></script>
+		<script type="text/javascript" language="JavaScript">
+		var g_bIsInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
+		
+		
+		var  queue = [];
+		var polling_interval_for_queue = 100; //this is in milliseconds
+		var queue_time_out_var = setInterval( processQueue , polling_interval_for_queue);	
+		var unloaded = false;	
+		var currentWindow = window;
+		var parentWindow = window.parent;
+		var topWindow = window.top;
+		try
+		{
+			if(parentWindow.document)
+				var cmt = "tring to access document of parent window";
+		}
+		catch(e)
+		{
+			parentWindow = currentWindow;
+		}
+		try
+		{
+			if(topWindow.document)
+				var cmt = "tring to access document of top window";
+		}
+		catch(e)
+		{
+			topWindow = currentWindow;
+			try
+			{
+				while(topWindow.parent.document)
+					topWindow = topWindow.parent;
+			}
+			catch(e)
+			{}
+		}
+
+		function DoCPExit()
+		{
+			if(window != parentWindow && parentWindow && parentWindow["DoCPExit"] !== undefined )
+			{
+				parentWindow.DoCPExit();
+			}
+			else
+			{
+				if(topWindow == self)
+				{
+					var win = window.open("","_self");
+					win.close();
+				}
+				else
+				{
+					var win = window.top.open("","_self");
+					win.top.close();
+				}
+			}
+		}
+		
+		function addToQueue(queueElement)
+		{
+			trace("Adding to queue:" + Array.prototype.slice.call(queueElement).join(":"));
+			queue.push(queueElement);
+		}
+		
+		function flushQueue() {
+			if(unloaded)
+				return;
+			unloaded = true;
+			try
+			{
+				var CaptivateObj = g_bIsInternetExplorer ? Captivate : document.Captivate;
+				CaptivateObj.flushSwfQueue();
+			}
+			catch(e)
+			{
+			}
+			while (queue.length) {
+				var queueElement = queue.shift();
+				if (queueElement.length < 1) {
+					continue;
+				}	
+				var strFSCmd = new String (queueElement[0]);
+				if(strFSCmd == "CommitData") {
+					continue;
+				}
+				Captivate_ProcessExternalInterfaceCall.apply(this, queueElement);
+			}
+			try
+			{
+				trace("We are committing data");
+				if(parentWindow.IsRunningInConnect && (typeof parentWindow.IsRunningInConnect === "function") && !parentWindow.IsRunningInConnect())
+				{
+					parent.CommitData();
+				}
+			}
+			catch(e)
+			{
+				trace("We get exception when committing data:"+e);
+			}
+			deconcept.SWFObjectUtil.cleanupSWFs();
+		}
+		
+		window.onbeforeunload = function() { 
+			flushQueue();
+		}
+		
+		
+		function processQueue()
+		{
+			//trace("In process queue");
+			if(queue.length == 0 ) 
+			{
+				//trace("No elements in queue.");
+				return;
+			}
+			
+			var queueElement = queue.shift();
+			trace("In process queue-Will execute- "+ Array.prototype.slice.call(queueElement).join(":"));
+			Captivate_ProcessExternalInterfaceCall.apply(this, queueElement);
+			
+			
+		}
+		
+		
+		
+		//For handling conditonal launch of the debug window
+		
+		window.document.onkeypress = CheckForDebugCommand;
+
+		var intQuestionCounter = 0;
+		var ASCII_QUESTION = 63;
+		
+		function CheckForDebugCommand(e){
+
+
+			var intKeyCode = 0;			
+			if (window.event) {
+				e = window.event;
+				intKeyCode = e.keyCode;
+			}
+			else  {
+				intKeyCode = e.which;
+			}
+
+			if (intKeyCode == ASCII_QUESTION){
+				intQuestionCounter++;
+				if (intQuestionCounter == 3){
+					intQuestionCounter = 0;
+					
+					parent.ShowDebugWindow();
+				}
+			}
+			else if (intKeyCode !=0){		//in FireFox, the shift key comes through as a keypress with code of 0...we want to ignore this
+				intQuestionCounter = 0;
+			}
+		}		
+		
+		
+		//for concede control
+			
+		function ConcedeControl()
+		{
+			parent.ConcedeControl();
+		}
+		
+		function CPHasStudentName()
+		{
+			return true;
+		}	
+
+		var m_StudentName ; 
+		
+		function CPGetStudentName()
+		{
+			if(m_StudentName)
+		    {
+		        return m_StudentName ;
+		    }
+		    var lStudentName = parent.GetStudentName() ;
+		    var lLastError = parent.GetLastError();
+		    if(lLastError === 0 )
+		    {
+		        m_StudentName = lStudentName ;
+		    }
+		    return lStudentName ;
+		}
+		
+		
+		//for jstrace - must be removed in checked-in code
+		function trace( msg ){
+				if( typeof( jsTrace ) != 'undefined' ){
+						jsTrace.send( msg );
+					}
+				else parent.WriteToDebug("CP:"+msg);
+			}
+		
+		
+		
+			// set document.domain property here, if it works for your environment/SCORM implementation
+			// document.domain="";
+			
+			
+			
+			
+			var intIntervalSecs = 0.5;				// Interval for checking whether scorm API is loaded or not
+			var SCORMAPILoadedTimeOutVar;
+			var SCORMAPILoadedCheckTries = 10;		//Check for these many times to see whether the API is loaded
+			var makeCallsToDriver	= false;
+			var strURLFile = "eLC_CAP_CostOfQuality_v1.2.swf";			// Name of the flash file
+			var strURLBase = "";
+			var strURLParams = "";
+			var strURLFull = document.location + "";
+			var intTemp = strURLFull.indexOf("#");
+			if (intTemp == -1)
+				intTemp = strURLFull.indexOf("?");
+			if (intTemp > 0)
+				strURLParams = strURLFull.substring(intTemp + 1, strURLFull.length);
+			var strTemp = location.protocol.toUpperCase();
+			if (strTemp.indexOf("FILE") == -1)
+			  var intTemp = location.pathname.lastIndexOf("/");
+			else
+			  var intTemp = location.pathname.lastIndexOf("\\");
+			if (intTemp != -1)
+			  strURLBase = location.protocol + "//" + location.host + location.pathname.substring(0, intTemp + 1);
+			else
+			  strURLBase = location.protocol + "//" + location.host + location.pathname;
+
+			strURLParams = (strURLParams==unescape(strURLParams)?escape(strURLParams):strURLParams);
+			strURLParams = (strURLParams==""?"":"?") + strURLParams;
+			
+			
+			/*
+			 Check whether everythig is loaded so that the SWF can begin making calls to the 
+			 scorm driver.
+			 Check at intervals of intIntervalSecs for SCORMAPILoadedCheckTries times.
+			*/
+			function CheckAPILoad(trial_num)
+			{
+				
+				if(parent.IsLoaded() || (trial_num > SCORMAPILoadedCheckTries))
+				{
+					
+					makeCallsToDriver = true;
+					
+					if(trial_num > SCORMAPILoadedCheckTries)
+					{
+						trace("Unable to load driver - aborting attempts to look for driver");
+						makeCallsToDriver = false;
+					}
+					
+					clearTimeout(SCORMAPILoadedTimeOutVar);
+				}
+				else
+				{
+					var x = trial_num+1;
+					SCORMAPILoadedTimeOutVar = setTimeout( "CheckAPILoad("+x+")", intIntervalSecs);
+				}
+			
+			}
+			
+			
+			
+			//This function name should not be changed - scormdriver.js internally calls this. 
+			 
+			function LoadContent(){
+				
+				trace("LoadContent: Has API loaded and been properly initialized?:"+String(parent.IsLoaded()));
+
+				var CaptivateObj = g_bIsInternetExplorer ? Captivate : document.Captivate;
+				CaptivateObj.setDriverInitialized();
+				trace("Exiting Load content...");
+				return;
+				
+			}
+			
+			
+			
+			
+			
+			/*
+				In AICC the result can be the following strings: correct, wrong, unanticipated, neutral
+				In SCORM the possible values can be: correct, incorrect, unanticipated, neutral
+				
+				Map these to the corresponding constants in the RUSTICI SCORM driver
+				"incorrect" in SCORM is mapped to the contant INTERACTION_RESULT_WRONG
+			*/
+			function ConvertToInteractionResultConstant(token_str)
+			{
+					
+				
+				var c = token_str.toLowerCase();
+				var interactionResult;
+				switch(c)
+				{
+					case "correct": 
+						interactionResult = parent.INTERACTION_RESULT_CORRECT;
+						break;
+						
+					case "wrong": 
+						interactionResult = parent.INTERACTION_RESULT_WRONG;
+						break;
+					
+					case "unanticipated": 
+						interactionResult = parent.INTERACTION_RESULT_UNANTICIPATED;
+						break;
+					
+					case "neutral": 
+						interactionResult = parent.INTERACTION_RESULT_NEUTRAL;
+						break;
+					
+					case "incorrect": 
+						interactionResult = parent.INTERACTION_RESULT_WRONG;
+						break;
+					
+					default:
+						trace("Could not find appropriate token for interaction result! -" + token_str);
+				
+				}
+				
+				return interactionResult;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			/*
+			Normally the SWF is embedded in the body (as in the SCORM templates). In AICC
+			we want the parents' onLoad() to be called first and then the SWF be embedded
+			*/
+			function EmbedSWF()
+			{
+				parent.blnDebug = false ;
+				trace("In EmbedSWF");
+				
+				//strURLParams = "?AICC_SID=23de4a4d-d5f6-4789-86a2-d657d8261214&AICC_URL=http%3A//cloud.scorm.com/ScormEngineInterface/ProcessAiccRequest.jsp";
+				var so = new SWFObject(strURLFile + strURLParams, "Captivate", "1074", "602", "10", "#CCCCCC");
+				trace("SWFObject URL:"+strURLFile + strURLParams);
+				so.addParam("quality", "high");
+				so.addParam("name", "Captivate");
+				so.addParam("id", "Captivate");
+				so.addParam("wmode", "window");
+				so.addParam("bgcolor", "#ffffff");
+				so.addParam("seamlesstabbing","false");
+				so.addParam("menu", "false");
+				so.addParam("AllowScriptAccess","always");
+				so.addVariable("variable1", "value1");
+				so.setAttribute("redirectUrl", "http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash");
+				so.write("CaptivateContent");
+				
+				document.getElementById('Captivate').focus();
+				document.Captivate.focus();
+				trace("Captivate focused!");
+			
+			}
+			
+			var timerId;
+			var initDriverTimer;
+			function reallyStartSD()
+			{
+				
+				trace("In reallyStartSD - will start scorm-driver now.");
+				var lConfirmFxn = parent.window.confirm;
+				parent.window.confirm = function(msg)
+				{
+					parent.window.confirm = lConfirmFxn;
+					parent.LoadContent();
+					return lConfirmFxn(msg); 
+				}
+				parent.Start();
+				var CaptivateObj = g_bIsInternetExplorer ? Captivate : document.Captivate;
+				//CaptivateObj.setDriverInitialized();
+				clearTimeout(timerId);
+			}
+			
+			
+			
+			function StartScormdriver()
+			{
+				trace("In StartScormdriver; Setting timeout for starting SCORM driver");
+				timerId = setTimeout(reallyStartSD,10);
+				return;
+			}
+			
+			function Captivate_DoExternalInterface()
+			{
+				trace("\nRecd EI call:"  + Array.prototype.slice.call(arguments).join(":") );
+				if(arguments.length <1) {
+					trace("Insufficient arguments to EI call");
+					return;
+				}
+				
+				
+				var strFSCmd = new String(arguments[0]);
+				var strErr = "true";
+				var retValForSWF = "";
+				var lastArg  = arguments[arguments.length-1];
+				if(lastArg && lastArg != "") retValForSWF = lastArg;
+				
+				addToQueue(arguments);
+				return true;
+			}
+			
+			
+			//modified call handler for EI calls
+			function Captivate_ProcessExternalInterfaceCall()
+			{
+					//trace("In  Captivate_DoExternalInterface, AICC_initialized:"+AICC_initialized);
+					//if(!AICC_initialized) return;
+					trace("\nIn Captivate_ProcessExternalInterfaceCall:"  + Array.prototype.slice.call(arguments).join(":") );
+					
+					//Interaction data related vars
+					var  interactionID_str, correctResponse_str, weight_int, studentResponse_str, result_str, latency_int, objectiveID_str, descriptionTexts;
+					var question_text="";
+					var CaptivateObj = g_bIsInternetExplorer ? Captivate : document.Captivate;
+					
+					
+					if(arguments.length <1) {
+						trace("Insufficient arguments to EI call");
+						return;
+					}
+					
+					
+					var strFSCmd = new String(arguments[0]);
+					/*This is the value to be set. Type can be an array or a string for now, but no strict cecking is done.
+					The repective function handler checks for the expected type*/
+					var SetVal = arguments[1];  
+					var strErr = "true";
+					var retValForSWF = "";
+					var lastArg  = arguments[arguments.length-1];
+					if(lastArg && lastArg != "") retValForSWF = lastArg;
+					
+					trace("Command Recd:"+strFSCmd);
+					
+					
+					// do nothing, if SCORM API is not available
+					/*if (!IsLoaded()) 
+						{
+							trace("Running instance of API not detected in  EI handler. Ignoring call.");
+							return;
+						}
+					*/
+					
+					//check if this is an interaction related function - if so, get the individual data strings - this
+					//is a temp. soln. till arity in Queue.as is officially increased
+					if( strFSCmd.indexOf("Interaction")>-1 && strFSCmd.indexOf("Record")>-1){
+					
+						trace("Found a record interaction call:" + strFSCmd);
+						
+						var interaction_arr = SetVal;
+						if(interaction_arr.length != 8) trace("ERROR! Wrong number of interaction elements received!");
+						
+						interactionID_str = interaction_arr[0];
+						correctResponse_str = interaction_arr[1];
+						weight_int = parseInt(interaction_arr[2]);
+						studentResponse_str = interaction_arr[3];
+						result_str = ConvertToInteractionResultConstant( interaction_arr[4] );
+						latency_int = parseInt(interaction_arr[5]);
+						objectiveID_str = interaction_arr[6];
+						descriptionTexts = interaction_arr[7];
+						//trace 'em all :)
+						trace("Interaction Elements:");
+						trace(interactionID_str);
+						trace(correctResponse_str);
+						trace(weight_int);
+						trace(studentResponse_str );
+						trace(result_str);
+						trace(latency_int);
+						trace(objectiveID_str);
+						trace(descriptionTexts);
+						
+						question_text = descriptionTexts.questionText;
+						trace("Question Text:"+question_text);
+					}
+					
+					
+					
+					//the API has already been initialized - so shouldn't be initialized again
+					//check whether its initialized and revert back
+					if(strFSCmd == "Start"){
+						
+						trace("Fwd:"+"Do nothing!");
+						//strErr 	= makeCallsToDriver;
+						if(parent.IsLoaded()) strErr = true;
+						else trace("Isloaded is false - sWF wont make any calls to LMS.");
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+						
+						
+					} else
+					
+					if(strFSCmd == "SetExitSuspendAfterCompleted"){
+						
+						trace("Fwd:"+"SetExitSuspendAfterCompleted!");
+						var lExitSuspendIfCompleted = (SetVal == "true"? true : false );
+						EXIT_SUSPEND_IF_COMPLETED = lExitSuspendIfCompleted;
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+						
+						
+					} else
+					
+					if(strFSCmd == "SetExitNormalIfPassed"){
+						
+						trace("Fwd:"+"SetExitNormalIfPassed!");
+						var lExitNormalIfPassed = (SetVal == "true"? true : false );
+						EXIT_NORMAL_IF_PASSED  = lExitNormalIfPassed;
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+						
+						
+					} else
+					
+					if( strFSCmd == "CommitData"){
+						trace("Fwd:"+"CommitData");
+						
+						strErr = parent.CommitData();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+						
+					} else
+					
+					if( strFSCmd == "SetReachedEnd"){
+						trace("Fwd:"+"SetReachedEnd:"+ SetVal);
+						
+						strErr = parent.SetReachedEnd();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					if( strFSCmd == "SetDataChunk"){
+						trace("Fwd:"+"SetDataChunk:"+ SetVal);
+						
+						strErr = parent.SetDataChunk(SetVal);
+						if(parent.AICCComm.blnAppearsToBeCrossDomain)
+							parent.CommitData();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					
+					if( strFSCmd == "SetPassed"){
+						trace("Fwd:"+"SetPassed");
+						
+						strErr = parent.SetPassed();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else 
+					
+					if( strFSCmd == "SetProgressMeasure"){
+						trace("Fwd:"+"SetProgressMeasure"+SetVal);
+						
+						strErr = parent.SetProgressMeasure(SetVal);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					if( strFSCmd == "SetFailed"){
+						trace("Fwd:"+"SetFailed");
+						
+						strErr = parent.SetFailed();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					
+					if( strFSCmd == "GetEntryMode"){
+						trace("Fwd:"+"GetEntryMode:");
+						
+						strErr = parent.GetEntryMode(SetVal);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					
+						
+					if( strFSCmd == "SetBookmark"){
+						trace("Fwd:"+"SetBookmark:"+ SetVal);
+						
+						strErr = parent.SetBookmark(SetVal);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					if( strFSCmd == "SetSessionTime"){
+						trace("Fwd:"+"SetSessionTime():" +  SetVal);
+						
+						strErr = parent.SetSessionTime(SetVal);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					if( strFSCmd == "GetLastError"){
+						trace("Fwd:"+"GetLastLMSErrorCode:");
+						
+						strErr = parent.GetLastLMSErrorCode();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					
+					if( strFSCmd == "GetLastErrorDesc"){
+						trace("Fwd:"+"GetLastErrorDesc:");
+						
+						strErr = parent.GetLastErrorDesc();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+			
+					
+					if( strFSCmd == "SetScore"){
+						trace("Fwd:"+"SetScore:" + SetVal );
+						
+						
+						//var scores = String(SetVal).split("|");
+						var scores = SetVal;
+						trace(String(scores));
+						strErr = parent.SetScore(scores[0], scores[1], scores[2]);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else 
+
+					if( strFSCmd == "SetPointBasedScore"){
+						trace("Fwd:"+"SetPointBasedScore:" + SetVal );
+						
+						
+						//var scores = String(SetVal).split("|");
+						var scores = SetVal;
+						trace(String(scores));
+						strErr = parent.SetPointBasedScore(scores[0], scores[1], scores[2]);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else 
+
+					
+					
+					if( strFSCmd == "Suspend"){
+						trace("Fwd:"+"Suspend:");
+						
+						strErr = parent.Suspend();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					if( strFSCmd == "GetDataChunk"){
+						trace("Fwd:"+"GetDataChunk:" );
+						
+						strErr = parent.GetDataChunk();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					} else
+					
+					if( strFSCmd == "ConcedeControl"){
+						trace("Fwd:"+"ConcedeControl");
+						
+						strErr = parent.ConcedeControl();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+						
+					} else
+					
+					
+					if( strFSCmd == "GetBookMark"){
+						trace("Fwd:"+"GetBookMark():" );
+						
+						strErr = parent.GetBookmark();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					if( strFSCmd == "GetLaunchData"){
+						trace("Fwd:"+"GetLaunchData():" );
+						
+						strErr = parent.GetLaunchData();
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					
+					
+					
+					
+					//Interaction set value handlers
+					if( strFSCmd == "RecordMultipleChoiceInteraction"){
+						trace("Fwd:"+"RecordMultipleChoiceInteraction():" );
+						
+						
+						
+						var correctResponse_arr = []
+						var studentResponse_arr = []
+						
+						//get the answer text arrays
+						var MCQ_answer_texts  = descriptionTexts.answerTexts;
+						
+						var split_char_correctResponse ="";
+						var split_char_studentResponse ="";
+						
+						if(correctResponse_str.indexOf(".") > -1) split_char_correctResponse = "." ;
+						if(correctResponse_str.indexOf(",") > -1) split_char_correctResponse = "," ;
+						
+						if(studentResponse_str.indexOf(".") > -1) split_char_studentResponse = "." ;
+						if(studentResponse_str.indexOf(",") > -1) split_char_studentResponse = "," ;
+						
+						
+						trace("Split char correct:" + split_char_correctResponse);
+						trace("Split char student:" + split_char_studentResponse);
+						
+						
+						if(correctResponse_str != "")
+						{
+							if(split_char_correctResponse!=""){
+								correctResponse_arr = correctResponse_str.split(split_char_correctResponse);
+							}
+							else{
+								correctResponse_arr.push(correctResponse_str);
+							}
+						}
+						else
+						{
+							correctResponse_arr.push("1");  // send in a dummy value here
+						}
+						
+						if(studentResponse_str != "")
+						{
+							if(split_char_studentResponse!=""){
+								studentResponse_arr = studentResponse_str.split(split_char_studentResponse);
+							}
+							else{
+								studentResponse_arr.push(studentResponse_str);
+							}
+						}
+						else
+						{
+							studentResponse_arr.push("1");  // send in a dummy value here
+						}
+						
+						
+						//create corresponding response identifier objects
+						correctResponse_ResponIdent_arr= [];
+						studentResponse_ResponIdent_arr= [];
+						
+						var idx = 0 ;
+						
+						if(MCQ_answer_texts)
+						{
+						    for (idx = 0; idx < correctResponse_arr.length; idx++)
+						    {
+						        var lLongText = MCQ_answer_texts[correctResponse_arr[idx]];
+						        if ((undefined == lLongText) || ("" == lLongText))
+						            lLongText = correctResponse_arr[idx];
+						        correctResponse_ResponIdent_arr.push(parent.CreateResponseIdentifier(correctResponse_arr[idx], lLongText));
+						    }
+
+						    for (idx = 0; idx < studentResponse_arr.length; idx++)
+						    {
+						        var lLongText = MCQ_answer_texts[studentResponse_arr[idx]];
+						        if ((undefined == lLongText) || ("" == lLongText))
+						            lLongText = studentResponse_arr[idx];
+						        studentResponse_ResponIdent_arr.push(parent.CreateResponseIdentifier(studentResponse_arr[idx], lLongText));
+						    }							    
+						}
+						else
+						{
+							for(idx = 0 ; idx < correctResponse_arr.length; idx++)  correctResponse_ResponIdent_arr.push(parent.CreateResponseIdentifier(correctResponse_arr[idx], correctResponse_arr[idx]));
+							for(idx = 0 ; idx < studentResponse_arr.length; idx++)  studentResponse_ResponIdent_arr.push(parent.CreateResponseIdentifier(studentResponse_arr[idx], studentResponse_arr[idx] ));
+						
+						}
+						
+						
+						strErr = parent.RecordMultipleChoiceInteraction(interactionID_str, studentResponse_ResponIdent_arr, result_str, correctResponse_ResponIdent_arr, question_text,  weight_int, latency_int, objectiveID_str);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					if( strFSCmd == "RecordTrueFalseInteraction"){
+						trace("Fwd:"+"RecordTrueFalseInteraction():" );
+						
+						var TF_answer_texts = descriptionTexts.answerTexts;
+						var bStudent_response = TF_answer_texts[studentResponse_str];
+						var bCorrect_response = TF_answer_texts[correctResponse_str];
+						
+						strErr = parent.RecordTrueFalseInteraction(interactionID_str, bStudent_response, result_str, bCorrect_response, question_text,  weight_int, latency_int, objectiveID_str);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					if( strFSCmd == "RecordFillInInteraction"){
+						trace("Fwd:"+"RecordFillInInteraction():" );
+						
+						
+						strErr = parent.RecordFillInInteraction(interactionID_str, studentResponse_str, result_str, correctResponse_str, question_text,  weight_int, latency_int, objectiveID_str);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					if( strFSCmd == "RecordMatchingInteraction"){
+						trace("Fwd:"+"RecordMatchingInteraction():" );
+						
+						
+						var leftColumnTexts = descriptionTexts.answerTexts.left;
+						var rightColumnTexts = descriptionTexts.answerTexts.right;
+						
+						var correctResponse_MatchingResponses_arr=[];
+						var studentResponse_MatchingResponses_arr=[];
+						
+						var temp_responses_arr = correctResponse_str.split(",");
+						var resp_idx = 0;
+						var curr_resp, src_target;
+						
+						for(resp_idx=0; resp_idx < temp_responses_arr.length; ++resp_idx){
+							curr_resp = temp_responses_arr[resp_idx];
+							src_target = curr_resp.split(".");
+							
+							var match_temp1  = src_target[0];
+							var match_temp2  = src_target[1];
+
+							var lLongLeftColText = leftColumnTexts[match_temp1];
+							var lLongRightColText = rightColumnTexts[match_temp2];
+							if ((undefined == lLongLeftColText) || ("" == lLongLeftColText))
+							    lLongLeftColText = match_temp1;
+							if ((undefined == lLongRightColText) || ("" == lLongRightColText))
+							    lLongRightColText = match_temp2;
+
+							var resp_src = parent.CreateResponseIdentifier(match_temp1, lLongLeftColText);
+							var resp_target = parent.CreateResponseIdentifier(match_temp2, lLongRightColText);
+							
+							//correctResponse_MatchingResponses_arr.push( new MatchingResponse(src_target[0], src_target[1])  );
+							correctResponse_MatchingResponses_arr.push( new parent.MatchingResponse(resp_src, resp_target)  );
+						}		
+						
+						temp_responses_arr = studentResponse_str.split(",");
+						for(resp_idx=0; resp_idx < temp_responses_arr.length; ++resp_idx){
+							curr_resp = temp_responses_arr[resp_idx];
+							src_target = curr_resp.split(".");
+							
+							var match_temp1  = src_target[0];
+							var match_temp2  = src_target[1];
+
+							var lLongLeftColText = leftColumnTexts[match_temp1];
+							var lLongRightColText = rightColumnTexts[match_temp2];
+							if ((undefined == lLongLeftColText) || ("" == lLongLeftColText))
+							    lLongLeftColText = match_temp1;
+							if ((undefined == lLongRightColText) || ("" == lLongRightColText))
+							    lLongRightColText = match_temp2;
+
+							var resp_src = parent.CreateResponseIdentifier(match_temp1, lLongLeftColText);
+							var resp_target = parent.CreateResponseIdentifier(match_temp2, lLongRightColText);
+							
+							//studentResponse_MatchingResponses_arr.push( new MatchingResponse(src_target[0], src_target[1])  );
+							studentResponse_MatchingResponses_arr.push( new parent.MatchingResponse(resp_src, resp_target)  );
+						}		
+						
+						
+						strErr = parent.RecordMatchingInteraction(interactionID_str, studentResponse_MatchingResponses_arr, result_str, correctResponse_MatchingResponses_arr, question_text,  weight_int, latency_int, objectiveID_str);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					
+					if( strFSCmd == "RecordSequencingInteraction"){
+						trace("Fwd:"+"RecordSequencingInteraction():" );
+
+						var lLongLearnerResponse = descriptionTexts.answerTexts.learner_response;
+						var lLongCorrectResponse = descriptionTexts.answerTexts.correct_response;
+						if ((undefined == lLongLearnerResponse) || ("" == lLongLearnerResponse))
+						    lLongLearnerResponse = studentResponse_str.substring(0, 1);
+						if ((undefined == lLongCorrectResponse) || ("" == lLongCorrectResponse))
+						    lLongCorrectResponse = correctResponse_str.substring(0, 1);
+						    
+						//strErr = RecordSequencingInteraction(interactionID_str, CreateResponseIdentifier(studentResponse_str.substring(0,1),studentResponse_str), result_str, CreateResponseIdentifier(correctResponse_str.substring(0,1),correctResponse_str), question_text,  weight_int, latency_int, objectiveID_str);
+
+						var student_resp_seq = parent.CreateResponseIdentifier(studentResponse_str.substring(0, 1), lLongLearnerResponse);
+						var correct_resp_seq = parent.CreateResponseIdentifier(correctResponse_str.substring(0, 1), lLongCorrectResponse);
+						
+						strErr = parent.RecordSequencingInteraction(interactionID_str, student_resp_seq, result_str, correct_resp_seq, question_text,  weight_int, latency_int, objectiveID_str);
+						
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					if( strFSCmd == "RecordLikertInteraction"){
+						trace("Fwd:"+"RecordLikertInteraction():" );
+						
+						
+						strErr = parent.RecordLikertInteraction(interactionID_str, parent.CreateResponseIdentifier(studentResponse_str.substring(0,1),studentResponse_str), true, null, question_text,  weight_int, latency_int, objectiveID_str);
+						
+						if(retValForSWF!="") CaptivateObj.SetScormVariable(retValForSWF, strErr); 
+						trace("Setting var in SWF:"+retValForSWF+" = "+strErr);
+					}else
+					
+					trace("This call has not been ported or is not handled yet.");
+					return strErr;
+				}
+		
+		</script>
+	</head>
+	
+	
+	
+	<body    bgcolor="#ffffff" >
+		<div id="CaptivateContent">
+		<noscript>
+				This course requires JavaScript to be enabled in your browser. 
+				Please enable JavaScript, then relaunch the course.
+			</noscript>
+		</div>
+	</body>
+</html>

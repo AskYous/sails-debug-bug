@@ -1,0 +1,25 @@
+
+<md-content layout="column" layout-padding="layout-padding" layout-wrap="layout-wrap" ng-controller="categoryCtrl as ctrl" class="main container category" ng-cloak>
+  <div class="heading" ng-if="ctrl.category">
+    <breadcrumb></breadcrumb><br/>
+    <div class="md-display-1">{{ctrl.category.name}}</div>
+    <div ng-if="ctrl.category == null" class="md-display-1">&nbsp;</div>
+    <p class="md-body-1">{{ctrl.category.descriptionShort}}</p>
+    <p ng-show="ctrl.category.descriptionShort == null" class="md-body-1">This category has no description! Admins, go <a ng-href="admin/#/Categories/details/{{ctrl.category.id}}" target="_blank">here </a><span>and add a description.</span></p>
+  </div>
+  <div layout="row" layout-xs="column" class="body">
+    <div layout="column" layout-fill="layout-fill" flex="flex" flex-xs="10" class="right">
+      <md-toolbar>
+        <div class="md-toolbar-tools md-subhead"><span class="md-subhead"><span>{{ctrl.category.name}} - </span><strong>{{filteredSubjects.length}} </strong><span>subject<span ng-if="filteredSubjects.length != 1">s</span></span></span><span flex="" class="space"></span><span class="sort-by-select md-subhead"><strong>Sort: </strong>
+          <md-input-container style="margin-top: 13px;">
+            <md-select ng-model="ctrl.sortBy" aria-label="Sort subjects by">
+              <md-option ng-value="opt.value" ng-repeat="opt in ctrl.sortOptions">{{ opt.name }}</md-option>
+            </md-select>
+          </md-input-container></span></div>
+        </md-toolbar>
+        <div class="subjects">
+          <content-row ng-repeat="s in (filteredSubjects = (ctrl.category.subjects | orderBy: ctrl.sortBy | filter: ctrl.subjectCategoryFilter))" content="s" content-type="'subjects'"></content-row>
+        </div>
+      </div>
+    </div>
+  </md-content>

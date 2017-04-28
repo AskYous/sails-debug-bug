@@ -1,0 +1,24 @@
+
+<div class="carousel">
+  <div class="md-display-1">{{$ctrl.carousel.title}}</div>
+  <div layout="row">
+    <md-button aria-label="left" ng-click="$ctrl.startScroll(-1)" class="left-button">
+      <md-icon>arrow_back</md-icon>
+    </md-button>
+    <div flex="flex" class="cards">
+      <md-button aria-label="" ng-repeat="item in $ctrl.carousel.items" ng-href="{{item.url}}" flex="noshrink" target="{{$ctrl.carousel.urlTarget}}">
+        <md-card><img ng-src="https://www.placehold.it/264x165" alt="{{item.name}}" ng-hide="item.img" class="md-card-image"/><img ng-src="{{item.img}}" alt="{{item.name}}" ng-show="item.img" class="md-card-image"/>
+          <md-divider inset="inset"></md-divider>
+          <md-card-content>
+            <p class="md-title">{{item.name}}</p>
+            <p>{{item.shortDescription}}</p>
+          </md-card-content>
+        </md-card>
+        <admin-overlay ng-if="item.visibilityLevel != null" visibility-level-id="item.visibilityLevel.id"></admin-overlay>
+      </md-button>
+    </div>
+    <md-button aria-label="right" ng-click="$ctrl.startScroll(1)" class="right-button">
+      <md-icon>arrow_forward</md-icon>
+    </md-button>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+// out: ../../dist/carousel.css, sourcemap: true, compress: true
+.carousel {
+  overflow-x: auto;
+  position: relative;
+
+  .left-button, .right-button{
+    transition: .25s;
+  }
+
+  .left-button{
+    opacity: 0;
+  }
+
+  .cards {
+    overflow-x: hidden;
+    white-space: nowrap;
+    transition: 1s;
+    margin-bottom: 50px;
+
+    .md-button {
+      display: inline-block;
+      padding: 0;
+      min-width: inherit;
+
+      md-card {
+        width: 284px;
+        text-transform: none;
+
+        .md-title {
+          white-space: normal;
+          margin: 0;
+          line-height: 25px;
+          min-height: 50px;
+        }
+
+        img {
+          height: 165px;
+          padding: 10px;
+        }
+      }
+    }
+  }
+}

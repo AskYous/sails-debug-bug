@@ -1,0 +1,88 @@
+
+<link rel="stylesheet" href="dist/subject.css" media="screen" charset="utf-8"/>
+<md-card layout="column" layout-padding="layout-padding" ng-controller="subjectCtrl as ctrl" class="main container subject-container">
+  <breadcrumb style="margin-left: 15px;"></breadcrumb>
+  <div layout="row" layout-align="center center" class="top course-header"><span ng-show="ctrl.currentLessonInstance" class="title md-title">{{ctrl.currentLessonInstance.name}}</span><span flex="" class="spacing"></span>
+    <md-input-container class="languages-select language-container">
+      <md-select ng-model="ctrl.currentLanguage.id" aria-label="Language select">
+        <md-option ng-value="language.id" ng-repeat="language in ctrl.languages" ng-click="ctrl.setCurrentLanguageById(language.id)" ng-if="ctrl.hasLessonsInLanguage(language)">{{ language.nativeName }}</md-option>
+      </md-select>
+    </md-input-container>
+  </div>
+  <video-player url="ctrl.videoSettings.url" poster="ctrl.videoSettings.poster" analytics-video-id="ctrl.videoSettings.analyticsVideoId" share-url="ctrl.videoSettings.shareUrl" feedback-url="ctrl.videoSettings.feedbackUrl" fixed-height="ctrl.videoSettings.fixedHeight" ng-if="ctrl.videoSettings.url" standard-elements="ctrl.videoSettings.standardElements" skipping="true" class="no-padding"></video-player>
+  <div layout="row" class="bottom no-padding">
+    <div flex="40" flex-xs="50" layout="column" class="left">
+      <div class="search-container">
+        <div flex="" layout="row" class="white">
+          <md-icon>search</md-icon>
+          <input flex="" type="text" ng-model="ctrl.search" placeholder="Search this course"/>
+        </div>
+      </div>
+      <md-list class="info">
+        <md-list-item layout="row"><span>{{ctrl.totalNumOfLessons()}} lessons | {{ctrl.getTotalDuration() | timeDisplay}}</span><span flex="" class="space"></span>
+          <md-button ng-href="{{ctrl.getSubjectShareUrl()}}" class="share md-icon-button">
+            <md-icon>share</md-icon>
+          </md-button>
+        </md-list-item>
+        <md-divider></md-divider>
+      </md-list>
+      <md-content layout="column" class="courses">
+        <div ng-repeat="course in ctrl.currentSubject.Courses | filter:ctrl.search track by $index" ng-class="{ disabled: !ctrl.courseSupported(course), highlighted: ctrl.highlightedCourse == course.id }" class="course md-body-1">
+          <admin-overlay visibility-level-id="course.visibilityLevel" fade="false"></admin-overlay>
+          <div layout="row" layout-align="start center" class="title">
+            <md-button ng-click="ctrl.toggleCourseAccordian(course)" aria-label="Expand / collapse course" ng-disabled="!ctrl.courseSupported(course)" class="toggle-expansion md-icon-button">
+              <md-icon ng-if="!ctrl.isExpanded(course)" class="toggle expand">chevron_right</md-icon>
+              <md-icon ng-if="ctrl.isExpanded(course)" class="toggle collapsed">expand_more</md-icon>
+            </md-button><strong flex="flex" class="name">{{$index + 1}}. {{ctrl.getCourseInstance(course).name}}<span ng-if="!ctrl.courseSupported(course)" title="This course is not available in {{ctrl.currentLanguage.name}}">({{ctrl.currentLanguage.translations.courseNotAvailable}})</span>
+              <admin-overlay visibility-level-id="ctrl.getCourseInstance(course).visibilityLevel"></admin-overlay></strong>
+          </div>
+          <div ng-if="ctrl.isExpanded(course)" class="lessons">
+            <div ng-repeat="lesson in course.Lessons | orderBy:&quot;sequenceNumber&quot; | filter:ctrl.search track by $index" ng-click="ctrl.setCurrentLesson(lesson)" layout="row" layout-padding="layout-padding" ng-class="{active: ctrl.isCurrentLesson(lesson)}" ng-if="ctrl.getLessonInstance(lesson)" class="lesson">
+              <admin-overlay visibility-level-id="lesson.visibilityLevel" fade="false"></admin-overlay>
+              <div flex="85" class="name" title="{{ctrl.getLessonInstance(lesson).name}}">
+                <span>{{$index + 1}}. </span>
+                <span ng-if="ctrl.getLessonInstance(lesson)">{{ctrl.getLessonInstance(lesson).name}}</span>
+                <admin-overlay visibility-level-id="ctrl.getLessonInstance(lesson).visibilityLevel" fade="false"></admin-overlay><br/>
+                <div class="duration">{{ctrl.getLessonInstance(lesson).duration | timeDisplay}}</div>
+              </div>
+              <md-icon ng-show="ctrl.getLessonInstance(lesson).watched" aria-label="watched" title="Watched" class="watched">remove_red_eye</md-icon>
+            </div>
+          </div>
+          <md-divider></md-divider>
+        </div>
+      </md-content>
+    </div>
+    <div flex="60" flex-sm="50" layout="column" class="right">
+      <md-tabs>
+        <md-tab label="details" class="details">
+          <md-content layout="column" layout-padding="layout-padding">
+            <h1 class="md-body-3">{{ctrl.currentSubjectInstance.name}}</h1>
+            <md-divider></md-divider>
+            <md-content class="description">
+              <p class="has-description">{{ctrl.currentSubjectInstance.descriptionLong || ctrl.currentSubjectInstance.descriptionShort}}</p>
+              <p ng-if="!ctrl.currentSubjectInstance.descriptionLong &amp;&amp; !ctrl.currentSubjectInstance.descriptionShort" class="no-description"> <span>This subject has no description. Admins, go </span><a ng-href="/admin/#/Subjects/details/{{ctrl.currentSubject.id}}" target="_blank">here</a><span> to add a description for this course.</span></p>
+            </md-content>
+          </md-content>
+        </md-tab>
+        <md-tab label="discussion" layout="column" style="height: 100%" class="discussion">
+          <md-content layout="column" class="yammer">
+            <div id="yammer-feed" flex="flex" ng-init="ctrl.initYammer()"></div>
+          </md-content>
+        </md-tab>
+        <md-tab label="References ({{ctrl.currentLessonInstance.references.length}})" class="references" layout="column" layout-align="center stretch">
+          <div flex="100" ng-repeat="reference in ctrl.currentLessonInstance.references | orderBy: &quot;name&quot;">
+            <md-button ng-href="{{reference.url}}" target="_blank">
+              <md-icon ng-style="{ 'color': ctrl.getReferenceTypeById(reference.type).color}">
+                {{ctrl.getReferenceTypeById(reference.type).materialIcon}}
+              </md-icon>
+              <span>{{reference.name}}</span>
+            </md-button>
+          </div>
+        </md-tab>
+        <md-tab label="reports" class="reports">
+          <md-content layout-padding="layout-padding" layout="column">No reports yet.</md-content>
+        </md-tab>
+      </md-tabs>
+    </div>
+  </div>
+</md-card>

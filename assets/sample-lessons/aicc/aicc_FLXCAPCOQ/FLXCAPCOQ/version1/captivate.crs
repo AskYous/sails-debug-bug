@@ -1,0 +1,26 @@
+; ----------------------------------------
+;
+; AICC Course Interchange File.
+;
+;
+; ----------------------------------------
+
+[Course]
+Course_ID=FLXCAPCOQ
+Course_Title =Cost of Quality
+Level=3
+Course_Creator=Harsha Vardhini
+Course_System=Adobe Captivate
+Total_AUs=1
+Total_Blocks=0
+Total_Objectives=0
+Total_Complex_Obj=0
+Max_Fields_CST=1
+Max_Fields_ORT=0
+Version=1.0
+
+[Course_Behavior]
+Max_Normal=99
+
+[Course_Description]
+FLXCAPCOQ: Cost of Quality. Description: This course will describe the costs incurred in preventing  quality loss. Target Audience: Engineers/ fresh hires in the Quality division as well as ISO / Reliability / RMA / Supplier / Vendor Quality divisions. Course Duration: 2 Mins. SME: Susan Hughes

@@ -1,0 +1,108 @@
+ <html>
+<head>
+	<script src="standard.js" type="text/javascript"></script>
+	<script type="text/javascript" language="JavaScript1.2">
+	
+	
+	
+		var g_bIsInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
+		var strURLFile = "AICCPostRouter.swf";		// Name of the flash file
+		var CaptivateAICCMovie;
+		
+		function trace( msg ){
+			if( typeof( jsTrace ) != 'undefined' ){
+					jsTrace.send( msg );
+				}
+			else parent.WriteToDebug("CP:"+msg);
+		}
+		
+		
+		
+		//The SWF must be explicitly embedded, we dont want to start making calls before parent page has loaded completely
+		
+		function EmbedSWF()
+		{
+			var so = new SWFObject(strURLFile, "Captivate", "1", "1", "10", "#CCCCCC");
+			//trace("SWFObject URL:"+strURLFile + strURLParams);
+			so.addParam("quality", "low");
+			so.addParam("name", "Captivate");
+			so.addParam("id", "Captivate");
+			so.addParam("wmode", "window");
+			so.addParam("bgcolor","#f5f4f1");
+			so.addParam("menu", "false");
+			so.addParam("AllowScriptAccess", "always");
+			so.addVariable("variable1", "value1");
+			so.setAttribute("redirectUrl", "http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash");
+			so.write("CaptivateContent");
+			
+			
+			document.getElementById('Captivate').focus();
+			document.Captivate.focus();
+			
+			
+			CaptivateAICCMovie = g_bIsInternetExplorer ? Captivate : document.Captivate;
+		}
+		
+		//Let the parent call this function  - we make the actual HTTP post from this page
+		function makeHTTPPost(strAICCURL, strPostData, strRequestType, strCallBack)
+		{
+			trace("Called HTTP post in child frame.");
+			CaptivateAICCMovie.makeHTTPPost(strAICCURL, strPostData, strRequestType, strCallBack);
+		
+		}
+		
+		function handlePendingReq(url,data)
+		{
+			trace("in handle pending req:");
+			window.AICCFinalPoster.makePendingPost(url,data);
+		}
+		
+		function flushQueue()
+		{
+			if(CaptivateAICCMovie)
+			{
+				CaptivateAICCMovie.getPendingRequests();
+				if(CaptivateAICCMovie.areRequestsPending())
+				{
+					CaptivateAICCMovie.flushQ();				
+				}
+			}
+		}
+		
+		
+		
+		/*All EI calls should preferrably happen this function is called; this is called from the SWF
+		and establishes that EI is ready to be used from the HTML side*/
+		function InitializeCalls()
+		{
+			//call the parent - thats where all intialization is to be done
+			parent.InitializeCalls();
+		}
+		
+		function ProcessLMSResult(requestType, responseStr)
+		{
+			//pass to parent
+			trace("Calling parent ProcessLMSResult with:"+requestType+","+responseStr);
+			parent.ProcessLMSResult(requestType, responseStr);			
+		};
+		
+
+		
+	</script>
+</head>	
+ 
+ 
+<body  bgcolor="#f5f4f1" >
+	   
+		<center>
+			<div id="CaptivateContent">&nbsp;</div>			
+		</center>
+		<frameset  border="0"  style="visibility:hidden;display:none" >
+		<iframe name="AICCFinalPoster" src="finalPoster.html">
+		</frameset>
+		
+	
+	
+</body>
+	
+</html>

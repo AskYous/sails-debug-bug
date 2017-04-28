@@ -1,0 +1,120 @@
+// out: ../dist/subject.css, sourcemap: true, compress: false
+// main: ../styles/styles.less
+@whiteGray: #e7e7e7;
+@borderGray: #dddcdd;
+@primaryColor: #00B2FD;
+md-card.subject-container {
+  margin: 20px auto;
+  padding: 0;
+  .top {
+    padding-right: 20px;
+    .md-title {
+      padding-left: 15px;
+    }
+
+    .language-container {
+      margin-bottom: 0;
+    }
+
+    * {
+      vertical-align: middle;
+    }
+    video-player{
+      min-height: 500px;
+    }
+  }
+  .left {
+    border-right: @borderGray solid 1px;
+    .info{
+      padding-bottom: 0;
+      md-list-item {
+        padding: 5px 15px;
+        padding-right: 0;
+        font-size: 12px !important;
+        color: gray;
+        md-icon, .md-icon-button{
+          font-size: 16px;
+          // color: black;
+        }
+      }
+    }
+    .courses {
+      height: 535px;
+      overflow-y: auto;
+      .course {
+        &.highlighted {
+          background-color: rgba(53, 96, 255, 0.26);
+        }
+        button.toggle-expansion{
+          margin: 0;
+        }
+        md-icon.toggle{
+          color: @primaryColor;
+        }
+        div.name{
+          position: relative;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+        .lessons {
+          .lesson {
+            padding: 0;
+            padding-left: 50px;
+            font-size: 10pt;
+            line-height: 14px;
+            margin-bottom: 0px;
+            &.active{
+              background-color: @whiteGray;
+            }
+            &:hover{
+              cursor: pointer;
+              background-color: @whiteGray;
+            }
+            .pdf a{
+              color: #b61500;
+            }
+            .watched{
+              color: @primaryColor;
+              font-size: 20px;
+            }
+            .duration{
+              color: gray;
+              margin-top: 5px;
+              font-style: italic;
+            }
+          }
+          .lesson:first-child{
+            margin-top: 0px;
+          }
+        }
+      }
+    }
+  }
+  .right{
+    md-tabs, [md-tabs-template], md-content, #yammer-feed{
+      height: 100%;
+    }
+    md-content.yammer{
+      overflow-y: hidden;
+    }
+  }
+  div.search-container {
+    padding: 7px;
+    background-color: @whiteGray;
+  }
+  .no-padding {
+    padding: 0;
+  }
+  .search-container .white {
+    background-color: white;
+    border: solid @borderGray 1px;
+    border-radius: 2px;
+    padding: 2px;
+
+    input{
+      padding: 5px;
+      border: 0;
+    }
+  }
+}

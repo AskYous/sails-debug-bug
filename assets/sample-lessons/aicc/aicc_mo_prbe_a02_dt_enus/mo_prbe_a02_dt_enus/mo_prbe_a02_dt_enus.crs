@@ -1,0 +1,20 @@
+[Course]
+Course_Creator=SkillSoft
+Course_System=SkillSoft Development
+Course_Title=Creating a Task-Based Schedule in Microsoft Project 2013
+Course_ID=mo_prbe_a02_dt_enus
+Level=1
+Max_Fields_CST=2
+Total_AUs=1
+Total_Blocks=0
+Version=2.2
+
+
+[Course_Behavior]
+Max_Normal=99
+
+
+[Course_Description]
+Course_Description=Knowing how to create and work with a task-based project schedule is at the heart of managing a project successfully using Project 2013. In this course, you will learn how to set up project information, create and organize project tasks, and determine how tasks are scheduled. You'll also learn how to manage resources and resolve scheduling conflicts across multiple projects. This course is one of a series in the SkillSoft learning path that covers the objectives for the Managing Projects with Microsoft Project 2013 certification exam (74-343).
+TargetAudience=End users at all levels, including those who have little or no familiarity with Microsoft Project 2013 and more experienced users who want to learn more about Project 2013 and master the skills required to sit the Managing Projects with Microsoft Project 2013 certification exam.
+Duration=01:39

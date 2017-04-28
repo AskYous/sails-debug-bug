@@ -1,0 +1,38 @@
+#view-search .top .query {
+  font-style: italic;
+  color: gray;
+}
+#view-search .bottom .results {
+  padding: 0;
+}
+#view-search .bottom .result md-toolbar {
+  background-color: #313131;
+  color: white;
+  height: 40px;
+}
+#view-search .bottom .result md-toolbar .md-button {
+  margin: 0;
+}
+#view-search .bottom .result md-toolbar .md-button md-icon {
+  color: #00B2FD;
+}
+#view-search .bottom .result md-toolbar .md-toolbar-tools {
+  padding-right: 0;
+}
+#view-search .bottom .result a {
+  text-decoration: none;
+}
+#view-search .bottom .result a:hover {
+  text-decoration: underline;
+}
+#view-search .bottom .result .default img {
+  width: 100%;
+}
+#view-search .bottom md-toolbar {
+  min-height: 0px;
+  padding: 0;
+}
+#view-search .bottom md-toolbar .md-toolbar-tools {
+  font-size: 18px;
+  height: 50px;
+}
